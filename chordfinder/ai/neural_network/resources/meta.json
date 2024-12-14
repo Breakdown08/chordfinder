@@ -1,0 +1,20 @@
+{
+    "sr": 16000,
+    "dt": 1.0,
+    "n_classes": 8,
+    "n_mels": 64,
+    "hop_length": 256,
+    "n_fft": 1024,
+    "threshold": 0.01,
+    "frames": 63,
+    "classes": [
+        "Am",
+        "Bb",
+        "Bdim",
+        "C",
+        "Dm",
+        "Em",
+        "F",
+        "G"
+    ]
+}
