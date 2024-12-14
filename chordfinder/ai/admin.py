@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import APIKiey
+from ai.models import APIKey
 
-admin.site.register(APIKiey)
+admin.site.register(APIKey)
