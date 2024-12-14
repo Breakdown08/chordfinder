@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-placeholder'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', 'chordfinder.ru']
+ALLOWED_HOSTS = ['localhost', 'chordfinder.ru', '127.0.0.1']
 
 
 # Application definition
