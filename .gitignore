@@ -1,3 +1,4 @@
 ._*
 .secrets.toml
 chordfinder/logs/
+__pycache__/

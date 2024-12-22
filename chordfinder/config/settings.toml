@@ -18,7 +18,8 @@ ENV_NAME = 'local'
 [production] # -------------------------------------------------
 DEBUG = false
 ALLOWED_HOSTS = ['chordfinder.ru']
-STATIC_ROOT = '/static/'
+STATICFILES_DIRS = ['/home/admin/chordfinder/chordfinder/ai/static']
+STATIC_ROOT = '/var/www/chordfinder/static'
 STATIC_URL = '/static/'
 MEDIA_ROOT = '/media/'
 MEDIA_URL = '/api/media/'
