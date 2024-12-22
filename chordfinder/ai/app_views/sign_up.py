@@ -59,7 +59,7 @@ def send_activation_link(request, user, to_email):
     token = account_activation_token.make_token(user)
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     domain = get_current_site(request).domain if settings.ENV_NAME == 'local' else settings.SITE_URL
-    protocol = 'https' if request.is_secure() else 'http'
+    protocol = 'http' if settings.ENV_NAME == 'local' else 'https'
     url = "activate_account"
     message = render_to_string("template_activate_account.html", {
         'user': user.username,
