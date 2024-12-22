@@ -143,6 +143,7 @@ ENV_NAME = '' #ENV_OVERRIDE
 SECRET_KEY = '' #ENV_OVERRIDE
 DEBUG = '' #ENV_OVERRIDE
 ALLOWED_HOSTS = ['*'] #ENV_OVERRIDE
+SITE_URL = '' #ENV_OVERRIDE
 
 # ==================     Import Manager Dynaconf     ========================
 # to switch the environment you use:
