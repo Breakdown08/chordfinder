@@ -37,7 +37,7 @@ def password_reset_request(request):
 def send_reset_password_request(request, user):
     uid = urlsafe_base64_encode(force_bytes(user.pk))
     token = account_activation_token.make_token(user)
-    domain = get_current_site(request).domain
+    domain = get_current_site(request).domain if settings.ENV_NAME == 'local' else settings.SITE_URL
     protocol = 'https' if request.is_secure() else 'http'
     subject = "Запрос на смену пароля"
     url = "reset"
