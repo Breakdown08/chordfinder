@@ -1,0 +1,32 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+{% block links %}
+	<link rel="stylesheet" href="{% static 'frontend/css/vertical_section.css' %}" />
+{% endblock %}
+
+{% block content %}
+	<section class="vertical_section">
+		<div class="login_form">
+			<h2>Вход в аккаунт</h2>
+			<form method="post" id="contactForm" novalidate="novalidate">
+				{% csrf_token %}
+				<ul>
+					<li><input type="text" class="form-control" id="name" name="username" placeholder="Имя пользователя" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Имя пользователя'"></li>
+					<li><input type="password" class="form-control" id="name" name="password" placeholder="Пароль" onfocus="this.placeholder = ''" onblur="this.placeholder = 'Пароль'"></li>
+					<li><button type="submit" value="submit" class="button primary fit">Войти</button></li>
+					<a href="{% url 'password_reset_request_url' %}">Забыли пароль?</a>
+				</ul>
+                {% if form.errors_to_render %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for item in form.errors_to_render %}
+                                <li>{{ item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+			</form>
+		</div>
+	</section>
+{% endblock %}

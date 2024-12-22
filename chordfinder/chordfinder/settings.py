@@ -11,22 +11,20 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from os.path import join, exists
+from os import mkdir, getenv
+from os.path import join
+from dataclasses import dataclass
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-placeholder'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', 'chordfinder.ru', '127.0.0.1']
-
+@dataclass(frozen=True)
+class Profile:
+    """Список профилей настроек проекта"""
+    __default = 'default'
+    local = 'local'
+    production = 'production'
 
 # Application definition
 
@@ -49,6 +47,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+LOGOUT_REDIRECT_URL = "homepage_url"
 
 ROOT_URLCONF = 'chordfinder.urls'
 
@@ -100,6 +100,19 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+# Emailing settings
+EMAIL_BACKEND = '' #ENV_OVERRIDE
+EMAIL_HOST = '' #ENV_OVERRIDE
+EMAIL_FROM = '' #ENV_OVERRIDE
+EMAIL_HOST_USER = '' #ENV_OVERRIDE
+EMAIL_HOST_PASSWORD = '' #ENV_OVERRIDE
+EMAIL_PORT = '' #ENV_OVERRIDE
+EMAIL_USE_TLS = '' #ENV_OVERRIDE
+
+PASSWORD_RESET_TIMEOUT = 14400
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -116,9 +129,44 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+MEDIA_ROOT = '' #ENV_OVERRIDE
+STATIC_ROOT = '' #ENV_OVERRIDE
+STATIC_URL = '' #ENV_OVERRIDE
+MEDIA_URL = '' #ENV_OVERRIDE
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ENV_NAME = '' #ENV_OVERRIDE
+SECRET_KEY = '' #ENV_OVERRIDE
+DEBUG = '' #ENV_OVERRIDE
+ALLOWED_HOSTS = ['*'] #ENV_OVERRIDE
+
+# ==================     Import Manager Dynaconf     ========================
+# to switch the environment you use:
+# $ export SETTINGS_PROFILE=[default | development | production | production_testing]
+#   python manage.py
+# SETTINGS_PROFILE exported from .env
+
+# HERE STARTS DYNACONF EXTENSION LOAD (Keep at the very bottom of settings.py)
+# Read more at https://dynaconf.readthedocs.io/en/latest/guides/django.html
+secrets = exists(join(BASE_DIR, 'config', '.secrets.toml'))
+env = exists(join(BASE_DIR, 'config', '.env'))
+if not secrets or not env:
+    raise FileNotFoundError(f'Файл .secrets.toml или .env не обнаружен в '
+                            f'папке конфиг. Их необходимо создать на основе'
+                            f'\"sample\" файлов.')
+
+import dynaconf  # noqa
+from config.config import settings as dyna_settings
+
+# HERE ENDS DYNACONF EXTENSION LOAD (No more code below this line)
+# ===========================================================================
+switch_settings = getenv('SETTINGS_PROFILE')
+if switch_settings not in [Profile.local, Profile.production]:
+    raise SystemExit(f'Внимание не выбрана конфигурация настроек!\n'
+                     f'Укажите в .env файле переменной SETTINGS_PROFILE '
+                     f'одно из значений - local, develop или production')
+print(f'+++ Starting with [{ENV_NAME}] settings. +++')

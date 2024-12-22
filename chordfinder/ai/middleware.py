@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from ai.models import APIKey
+from ai.models import Profile
 
 
 class APIKeyMiddleware:
@@ -14,7 +14,7 @@ class APIKeyMiddleware:
         if request.path.startswith('/api/'):
             # Проверяем, есть ли заголовки
             api_key = request.headers.get('Authorization', '').split('Bearer ')[-1] if hasattr(request, 'headers') else None
-            if not api_key or not APIKey.objects.filter(key=api_key, is_active=True).exists():
+            if not api_key or not Profile.objects.filter(api_key=api_key).exists():
                 return JsonResponse({'error': 'Invalid or missing API key'}, status=403)
 
         # Продолжаем обработку запроса

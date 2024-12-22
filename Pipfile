@@ -11,6 +11,9 @@ tensorflow = "*"
 matplotlib = "*"
 django = "*"
 gunicorn = "*"
+six = "*"
+dynaconf = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

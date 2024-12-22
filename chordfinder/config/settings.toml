@@ -1,0 +1,28 @@
+#  Файл настроек для управления back-end сервером
+[default] # -------------------------------------------------
+DEBUG = true
+SECRET_KEY = ''
+ALLOWED_HOSTS = ['*']
+MEDIA_URL = '/media/'
+STATIC_URL = '/static/'
+ENV_NAME = 'default'
+
+[local] # -------------------------------------------------
+DEBUG = true
+SECRET_KEY = ''
+ALLOWED_HOSTS = ['*']
+MEDIA_ROOT = '/media/'
+STATIC_ROOT = '/static/'
+STATIC_URL = '/static/'
+MEDIA_URL = '/api/media/'
+ENV_NAME = 'local'
+
+[production] # -------------------------------------------------
+DEBUG = false
+SECRET_KEY = ''
+ALLOWED_HOSTS = ['*']
+MEDIA_ROOT = '/media/'
+STATIC_ROOT = '/static/'
+STATIC_URL = '/api/static/'
+MEDIA_URL = '/api/media/'
+ENV_NAME = 'production'

@@ -1,0 +1,124 @@
+{% extends 'base_template.html' %}
+{% load static %}
+{% block content %}
+<section id="one">
+  <div class="inner">
+    <header class="major">
+      <h1>Документация</h1>
+    </header>
+    <h3>Пример curl запроса</h3>
+    <pre>
+      <code>curl -X POST \
+          'https://chordfinder.ru/api/predict' \
+          -H 'Authorization: Bearer <ваш_API_ключ>' \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "input": [Здесь данные фрагмента аудиозаписи в формате NumPy array.]
+        }'
+      </code>
+    </pre>
+    <div class="box">
+      <p>
+        <ul>
+          <li>Замените <ваш_API_ключ> на ваш действительный API ключ, который можно получить в личном кабинете после регистрации</li>
+          <li>В значение ключа input необходимо вставить данные фрагмента аудиозаписи в формате JSON_FLOAT_ARRAY (важно соблюдать формат, так как на стороне сервера он конвертируется в NumPy Array)</li>
+          <blockquote>NumPy Array представляет собой набор значений амплитуды звука в каждый конкретный момент времени. Эти данные используются для определения гармонической структуры фрагмента, что позволяет предсказать аккорды, которые были сыграны в этом фрагменте.
+            Размер данных массива ожидается с учётом частоты дискретизации 44100 Гц и длиной 1 секунда.</blockquote>
+          <li>Если вы используете другой язык программирования или инструмент для отправки HTTP-запросов, убедитесь, что запрос соответствует требованиям вашего инструмента и содержит все необходимые параметры.</li>
+        </ul>    
+      </p>
+    </div>
+    <h3>Пример клиентского Godot приложения <a href="https://godotengine.org/download/archive/3.5.3-stable/" target="_blank">(скачать версию 3.5.3 Stable)</a></h3>
+    <ul>
+      <li>Создайте новый проект</li>
+      <li>Разместите в сцене новый узел типа Label</li>
+      <li>Прикрепите к нему следующий скрипт</li>
+      <pre>
+        <code>
+extends Label
+
+export var api_key: String = ""
+export var host: String = "localhost"
+export var port: int = 8000
+export var use_https: bool = false
+
+var url = ""
+onready var headers = [
+	"Content-Type: application/json",
+	"Authorization: Bearer %s" % api_key
+]
+
+var http_request: HTTPRequest
+
+var audio_player: AudioStreamPlayer
+var capture_effect: AudioEffectCapture
+const BUFFER_SIZE: int = 64512
+
+
+func _ready():
+	configure_http_request()
+	configure_audio()
+
+
+func configure_http_request():
+	if use_https:
+		url += "https://"
+	else:
+		url += "http://"
+	url += str(host) + ":" + str(port) + "/api/predict"
+	http_request = HTTPRequest.new()
+	add_child(http_request, true)
+	var _err = http_request.connect("request_completed", self, "_on_request_completed")
+
+
+func configure_audio():
+	audio_player = AudioStreamPlayer.new()
+	add_child(audio_player)
+	audio_player.stream = AudioStreamMicrophone.new()
+	var bus_index = AudioServer.get_bus_index("Master")
+	AudioServer.set_bus_mute(bus_index, true)
+	capture_effect = AudioEffectCapture.new()
+	capture_effect.buffer_length = 1.0
+	AudioServer.add_bus_effect(bus_index, capture_effect)
+	audio_player.play()
+
+
+func _process(_delta):
+	if is_instance_valid(capture_effect):
+		if capture_effect.can_get_buffer(BUFFER_SIZE):
+			var microphone_data = capture_effect.get_buffer(BUFFER_SIZE)
+			var left_channel = get_channel_from_buffer(microphone_data, 0)
+			if left_channel[0] != 0:
+				send_frames(left_channel)
+	if Input.is_action_just_pressed("ui_cancel"):
+		get_tree().quit()
+
+
+func get_channel_from_buffer(data: PoolVector2Array, channel_id: int) -> Array:
+	var _channel_data: Array
+	for frame in data:
+		_channel_data.append(frame[channel_id])
+	return _channel_data
+
+
+func send_frames(frames: Array):
+	var json_body = JSON.print({"input": frames})
+	if frames[0] != 0 and http_request.get_http_client_status() != HTTPClient.STATUS_REQUESTING:
+		var _err = http_request.request(url, headers, false, 0, json_body)
+
+
+func _on_request_completed(_result, _response_code, _headers, body):
+	if body:
+		var json_result = JSON.parse(body.get_string_from_utf8()).result
+		if json_result:
+			text = json_result.get("label") if json_result.get("label") else ""
+        </code>
+      </pre>
+      <li>В значения экспортных переменных в редакторе укажите host=chordfinder.ru, use_https=true, port=443</li>
+      <li>Запустите проект</li>
+    </ul>    
+    <blockquote>Запущенный проект будет прослушивать звук со звукового устройства "по умолчанию" настроенного в целевой системе. Поддерживаются системы Windows, Linux, MacOS, Android, IOS.</blockquote>
+  </div>
+</section>
+
+{% endblock %}
