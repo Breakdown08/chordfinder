@@ -7,6 +7,5 @@ class AiConfig(AppConfig):
 
 
     def ready(self):
-        pass
-        # from ai.neural_network.model import start
-        # start()
+        from ai.neural_network.model import start
+        start()
