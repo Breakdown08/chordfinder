@@ -44,8 +44,8 @@ export var use_https: bool = false
 
 var url = ""
 onready var headers = [
-	"Content-Type: application/json",
-	"Authorization: Bearer %s" % api_key
+  "Content-Type: application/json",
+  "Authorization: Bearer %s" % api_key
 ]
 
 var http_request: HTTPRequest
@@ -56,62 +56,63 @@ const BUFFER_SIZE: int = 64512
 
 
 func _ready():
-	configure_http_request()
-	configure_audio()
+  configure_http_request()
+  configure_audio()
 
 
 func configure_http_request():
-	if use_https:
-		url += "https://"
-	else:
-		url += "http://"
-	url += str(host) + ":" + str(port) + "/api/predict"
-	http_request = HTTPRequest.new()
-	add_child(http_request, true)
-	var _err = http_request.connect("request_completed", self, "_on_request_completed")
+  if use_https:
+    url += "https://"
+  else:
+    url += "http://"
+  url += str(host) + ":" + str(port) + "/api/predict"
+  http_request = HTTPRequest.new()
+  add_child(http_request, true)
+  var _err = http_request.connect("request_completed", self, "_on_request_completed")
 
 
 func configure_audio():
-	audio_player = AudioStreamPlayer.new()
-	add_child(audio_player)
-	audio_player.stream = AudioStreamMicrophone.new()
-	var bus_index = AudioServer.get_bus_index("Master")
-	AudioServer.set_bus_mute(bus_index, true)
-	capture_effect = AudioEffectCapture.new()
-	capture_effect.buffer_length = 1.0
-	AudioServer.add_bus_effect(bus_index, capture_effect)
-	audio_player.play()
+  audio_player = AudioStreamPlayer.new()
+  add_child(audio_player)
+  audio_player.stream = AudioStreamMicrophone.new()
+  var bus_index = AudioServer.get_bus_index("Master")
+  AudioServer.set_bus_mute(bus_index, true)
+  capture_effect = AudioEffectCapture.new()
+  capture_effect.buffer_length = 1.0
+  AudioServer.add_bus_effect(bus_index, capture_effect)
+  audio_player.play()
 
 
 func _process(_delta):
-	if is_instance_valid(capture_effect):
-		if capture_effect.can_get_buffer(BUFFER_SIZE):
-			var microphone_data = capture_effect.get_buffer(BUFFER_SIZE)
-			var left_channel = get_channel_from_buffer(microphone_data, 0)
-			if left_channel[0] != 0:
-				send_frames(left_channel)
-	if Input.is_action_just_pressed("ui_cancel"):
-		get_tree().quit()
+  if is_instance_valid(capture_effect):
+    if capture_effect.can_get_buffer(BUFFER_SIZE):
+      var microphone_data = capture_effect.get_buffer(BUFFER_SIZE)
+      var left_channel = get_channel_from_buffer(microphone_data, 0)
+      if left_channel[0] != 0:
+        send_frames(left_channel)
+  if Input.is_action_just_pressed("ui_cancel"):
+    get_tree().quit()
 
 
 func get_channel_from_buffer(data: PoolVector2Array, channel_id: int) -> Array:
-	var _channel_data: Array
-	for frame in data:
-		_channel_data.append(frame[channel_id])
-	return _channel_data
+  var _channel_data: Array
+  for frame in data:
+    _channel_data.append(frame[channel_id])
+  return _channel_data
 
 
 func send_frames(frames: Array):
-	var json_body = JSON.print({"input": frames})
-	if frames[0] != 0 and http_request.get_http_client_status() != HTTPClient.STATUS_REQUESTING:
-		var _err = http_request.request(url, headers, false, 0, json_body)
+  var json_body
+  if frames[0] != 0 and http_request.get_http_client_status() != HTTPClient.STATUS_REQUESTING:
+    json_body = JSON.print({"input": frames})
+    var _err = http_request.request(url, headers, false, 0, json_body)
 
 
 func _on_request_completed(_result, _response_code, _headers, body):
-	if body:
-		var json_result = JSON.parse(body.get_string_from_utf8()).result
-		if json_result:
-			text = json_result.get("label") if json_result.get("label") else ""
+  if body:
+    var json_result = JSON.parse(body.get_string_from_utf8()).result
+    if json_result:
+      text = json_result.get("label") if json_result.get("label") else ""
         </code>
       </pre>
       <li>В значения экспортных переменных в редакторе укажите host=chordfinder.ru, use_https=true, port=443</li>
