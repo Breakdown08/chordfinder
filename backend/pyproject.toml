@@ -23,6 +23,9 @@ dev = [
     "mypy>=1.13",
     "httpx>=0.27",
 ]
+e2e = [
+    "playwright>=1.48",
+]
 # Keras -> ONNX only (`chordfinder export`); never needed at runtime.
 export = [
     "tensorflow==2.16.2",
@@ -37,6 +40,9 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Browser tests are slow and need the web build: `uv run --group e2e pytest -m e2e`.
+addopts = "-m 'not e2e'"
+markers = ["e2e: Chromium + exported Godot web build"]
 
 [tool.ruff]
 line-length = 110

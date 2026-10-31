@@ -5,15 +5,19 @@
 WebSocket /ws/recognize: first a text frame {"sample_rate": 48000}, then binary frames of mono
 float32 little-endian samples at that rate (stream.HOP_SECONDS each, 125 ms). Every frame gets a
 StreamReply about the last second of audio. POST /v1/predict answers for one clip.
+Everything else is the Godot web build (frontend/build/web, or CHORDFINDER_WEB), when exported.
 """
 
 import asyncio
+import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Annotated
 
 import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.types import Message
 
@@ -23,6 +27,9 @@ from chordfinder.model import ChordModel
 from chordfinder.stream import Stabilizer, Stream, recognize
 
 MAX_CLIP_SECONDS: float = 10.0
+# Single-threaded Godot build: no SharedArrayBuffer, so no COOP/COEP headers are needed.
+REPO: Path = Path(__file__).resolve().parents[3]
+WEB: Path = Path(os.environ.get("CHORDFINDER_WEB", REPO / "frontend/build/web"))
 
 
 @asynccontextmanager
@@ -127,3 +134,8 @@ async def recognize_stream(ws: WebSocket) -> None:
             await ws.send_json(reply.model_dump())
     except WebSocketDisconnect:
         return
+
+
+# Last: a mount at "/" would shadow the routes above.
+if (WEB / "index.html").is_file():
+    app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
