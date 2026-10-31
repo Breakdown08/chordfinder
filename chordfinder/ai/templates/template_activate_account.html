@@ -1,8 +1,0 @@
-{% autoescape off %}
-Команда chordfinder.ru приветствует Вас, {{ user.username }}!
-
-Пожалуйста, перейдите по ссылке ниже чтобы подтвердить и завершить регистрацию аккаунта:
-
-{{ protocol }}://{{ domain }}{% url 'activate_account_url' uidb64=uid token=token %}
-(Если вдруг это письмо адресовано не Вам, то пожалуйста игнорируйте его.)
-{% endautoescape %}

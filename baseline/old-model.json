@@ -1,0 +1,1607 @@
+{
+ "dataset": "fabianavinci/guitar-chords-v3 Test",
+ "sr": 16000,
+ "accuracy": 0.959375,
+ "predictions": [
+  {
+   "file": "Am/Am_AcusticPlug26_1.wav",
+   "label": "Am",
+   "confidence": 0.992158055305481
+  },
+  {
+   "file": "Am/Am_AcusticPlug26_2.wav",
+   "label": "Am",
+   "confidence": 0.9986261129379272
+  },
+  {
+   "file": "Am/Am_AcusticPlug26_3.wav",
+   "label": "Am",
+   "confidence": 0.9918831586837769
+  },
+  {
+   "file": "Am/Am_AcusticPlug26_4.wav",
+   "label": "Am",
+   "confidence": 0.9862697720527649
+  },
+  {
+   "file": "Am/Am_AcusticPlug27_1.wav",
+   "label": "Am",
+   "confidence": 0.9893155097961426
+  },
+  {
+   "file": "Am/Am_AcusticPlug27_2.wav",
+   "label": "Am",
+   "confidence": 0.9927787184715271
+  },
+  {
+   "file": "Am/Am_AcusticPlug27_3.wav",
+   "label": "Am",
+   "confidence": 0.9896634221076965
+  },
+  {
+   "file": "Am/Am_AcusticPlug27_4.wav",
+   "label": "Am",
+   "confidence": 0.9952425956726074
+  },
+  {
+   "file": "Am/Am_AcusticPlug28_1.wav",
+   "label": "Am",
+   "confidence": 0.9942770600318909
+  },
+  {
+   "file": "Am/Am_AcusticPlug28_2.wav",
+   "label": "Am",
+   "confidence": 0.9968693852424622
+  },
+  {
+   "file": "Am/Am_AcusticPlug28_3.wav",
+   "label": "Am",
+   "confidence": 0.9953784942626953
+  },
+  {
+   "file": "Am/Am_AcusticPlug28_4.wav",
+   "label": "Am",
+   "confidence": 0.9945105314254761
+  },
+  {
+   "file": "Am/Am_AcusticPlug29_1.wav",
+   "label": "Am",
+   "confidence": 0.9893742203712463
+  },
+  {
+   "file": "Am/Am_AcusticPlug29_2.wav",
+   "label": "Am",
+   "confidence": 0.9970470070838928
+  },
+  {
+   "file": "Am/Am_AcusticPlug29_3.wav",
+   "label": "Am",
+   "confidence": 0.9924346208572388
+  },
+  {
+   "file": "Am/Am_AcusticPlug29_4.wav",
+   "label": "Am",
+   "confidence": 0.9886217713356018
+  },
+  {
+   "file": "Am/Am_AcusticPlug30_1.wav",
+   "label": "Am",
+   "confidence": 0.9850326776504517
+  },
+  {
+   "file": "Am/Am_AcusticPlug30_2.wav",
+   "label": "Am",
+   "confidence": 0.9760552048683167
+  },
+  {
+   "file": "Am/Am_AcusticPlug30_3.wav",
+   "label": "Am",
+   "confidence": 0.9795610308647156
+  },
+  {
+   "file": "Am/Am_AcusticPlug30_4.wav",
+   "label": "Am",
+   "confidence": 0.9908604621887207
+  },
+  {
+   "file": "Am/Am_AcusticVince_JO_1.wav",
+   "label": "Am",
+   "confidence": 0.9985257983207703
+  },
+  {
+   "file": "Am/Am_AcusticVince_JO_2.wav",
+   "label": "Am",
+   "confidence": 0.9985179305076599
+  },
+  {
+   "file": "Am/Am_AcusticVince_JO_3.wav",
+   "label": "Am",
+   "confidence": 0.9973264932632446
+  },
+  {
+   "file": "Am/Am_AcusticVince_JO_4.wav",
+   "label": "Am",
+   "confidence": 0.980991780757904
+  },
+  {
+   "file": "Am/Am_ClassicVince_JO_1.wav",
+   "label": "Em",
+   "confidence": 0.8497173190116882
+  },
+  {
+   "file": "Am/Am_ClassicVince_JO_2.wav",
+   "label": "Em",
+   "confidence": 0.563773512840271
+  },
+  {
+   "file": "Am/Am_ClassicVince_JO_3.wav",
+   "label": "G",
+   "confidence": 0.8131111860275269
+  },
+  {
+   "file": "Am/Am_ClassicVince_JO_4.wav",
+   "label": "Em",
+   "confidence": 0.8650137186050415
+  },
+  {
+   "file": "Am/Am_Classic_Jo_1.wav",
+   "label": "Am",
+   "confidence": 0.988695502281189
+  },
+  {
+   "file": "Am/Am_Classic_Jo_2.wav",
+   "label": "Am",
+   "confidence": 0.9764085412025452
+  },
+  {
+   "file": "Am/Am_Classic_Jo_3.wav",
+   "label": "Am",
+   "confidence": 0.9883976578712463
+  },
+  {
+   "file": "Am/Am_Classic_Jo_4.wav",
+   "label": "Am",
+   "confidence": 0.9154490232467651
+  },
+  {
+   "file": "Am/Am_Electric1_LInda_1.wav",
+   "label": "Am",
+   "confidence": 0.9808472990989685
+  },
+  {
+   "file": "Am/Am_Electric1_LInda_2.wav",
+   "label": "Am",
+   "confidence": 0.9844107627868652
+  },
+  {
+   "file": "Am/Am_Electric1_LInda_3.wav",
+   "label": "Am",
+   "confidence": 0.9871882200241089
+  },
+  {
+   "file": "Am/Am_Electric1_LInda_4.wav",
+   "label": "Am",
+   "confidence": 0.9868729710578918
+  },
+  {
+   "file": "Am/Am_Electric2_LInda_1.wav",
+   "label": "Am",
+   "confidence": 0.69207763671875
+  },
+  {
+   "file": "Am/Am_Electric2_LInda_2.wav",
+   "label": "C",
+   "confidence": 0.25323086977005005
+  },
+  {
+   "file": "Am/Am_Electric2_LInda_3.wav",
+   "label": "Am",
+   "confidence": 0.718328058719635
+  },
+  {
+   "file": "Am/Am_Electric2_LInda_4.wav",
+   "label": "Em",
+   "confidence": 0.3128405213356018
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug26_1.wav",
+   "label": "Bb",
+   "confidence": 0.9914234280586243
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug26_2.wav",
+   "label": "Bb",
+   "confidence": 0.9917991161346436
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug26_3.wav",
+   "label": "Bb",
+   "confidence": 0.9864674210548401
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug26_4.wav",
+   "label": "Bb",
+   "confidence": 0.9921092391014099
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug27_1.wav",
+   "label": "Bb",
+   "confidence": 0.9929123520851135
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug27_2.wav",
+   "label": "Bb",
+   "confidence": 0.9859674572944641
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug27_3.wav",
+   "label": "Bb",
+   "confidence": 0.9913086891174316
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug27_4.wav",
+   "label": "Bb",
+   "confidence": 0.9902496933937073
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug28_1.wav",
+   "label": "Bb",
+   "confidence": 0.9924594759941101
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug28_2.wav",
+   "label": "Bb",
+   "confidence": 0.9935793876647949
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug28_3.wav",
+   "label": "Bb",
+   "confidence": 0.9937363862991333
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug28_4.wav",
+   "label": "Bb",
+   "confidence": 0.9763352274894714
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug29_1.wav",
+   "label": "Bb",
+   "confidence": 0.9952483773231506
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug29_2.wav",
+   "label": "Bb",
+   "confidence": 0.9908478260040283
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug29_3.wav",
+   "label": "Bb",
+   "confidence": 0.9932591915130615
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug29_4.wav",
+   "label": "Bb",
+   "confidence": 0.9919875860214233
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug30_1.wav",
+   "label": "Bb",
+   "confidence": 0.9789875745773315
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug30_2.wav",
+   "label": "Bb",
+   "confidence": 0.9910500049591064
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug30_3.wav",
+   "label": "Bb",
+   "confidence": 0.9840937256813049
+  },
+  {
+   "file": "Bb/Bb_AcusticPlug30_4.wav",
+   "label": "Bb",
+   "confidence": 0.9820988178253174
+  },
+  {
+   "file": "Bb/Bb_AcusticVince_JO_1.wav",
+   "label": "Bb",
+   "confidence": 0.9933926463127136
+  },
+  {
+   "file": "Bb/Bb_AcusticVince_JO_2.wav",
+   "label": "Bb",
+   "confidence": 0.9975517392158508
+  },
+  {
+   "file": "Bb/Bb_AcusticVince_JO_3.wav",
+   "label": "Bb",
+   "confidence": 0.9950557947158813
+  },
+  {
+   "file": "Bb/Bb_AcusticVince_JO_4.wav",
+   "label": "Bb",
+   "confidence": 0.9972884654998779
+  },
+  {
+   "file": "Bb/Bb_ClassicVince_JO_1.wav",
+   "label": "Bb",
+   "confidence": 0.9878906011581421
+  },
+  {
+   "file": "Bb/Bb_ClassicVince_JO_2.wav",
+   "label": "Bb",
+   "confidence": 0.9858604669570923
+  },
+  {
+   "file": "Bb/Bb_ClassicVince_JO_3.wav",
+   "label": "Bb",
+   "confidence": 0.9981598258018494
+  },
+  {
+   "file": "Bb/Bb_ClassicVince_JO_4.wav",
+   "label": "Bb",
+   "confidence": 0.9910604357719421
+  },
+  {
+   "file": "Bb/Bb_Classic_Jo_1.wav",
+   "label": "Bb",
+   "confidence": 0.9916548728942871
+  },
+  {
+   "file": "Bb/Bb_Classic_Jo_2.wav",
+   "label": "Bb",
+   "confidence": 0.989815354347229
+  },
+  {
+   "file": "Bb/Bb_Classic_Jo_3.wav",
+   "label": "Bb",
+   "confidence": 0.99176424741745
+  },
+  {
+   "file": "Bb/Bb_Classic_Jo_4.wav",
+   "label": "Bb",
+   "confidence": 0.9896175265312195
+  },
+  {
+   "file": "Bb/Bb_Electric1_LInda_1.wav",
+   "label": "Bb",
+   "confidence": 0.9689399003982544
+  },
+  {
+   "file": "Bb/Bb_Electric1_LInda_2.wav",
+   "label": "Bb",
+   "confidence": 0.9906287789344788
+  },
+  {
+   "file": "Bb/Bb_Electric1_LInda_3.wav",
+   "label": "Bb",
+   "confidence": 0.9971195459365845
+  },
+  {
+   "file": "Bb/Bb_Electric1_LInda_4.wav",
+   "label": "Bb",
+   "confidence": 0.9866762757301331
+  },
+  {
+   "file": "Bb/Bb_Electric2_LInda_1.wav",
+   "label": "Bb",
+   "confidence": 0.9643539190292358
+  },
+  {
+   "file": "Bb/Bb_Electric2_LInda_2.wav",
+   "label": "Bb",
+   "confidence": 0.9290522933006287
+  },
+  {
+   "file": "Bb/Bb_Electric2_LInda_3.wav",
+   "label": "Bb",
+   "confidence": 0.9709867835044861
+  },
+  {
+   "file": "Bb/Bb_Electric2_LInda_4.wav",
+   "label": "Bb",
+   "confidence": 0.9925232529640198
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug26_1.wav",
+   "label": "Bdim",
+   "confidence": 0.984393298625946
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug26_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9817100167274475
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug26_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9822813272476196
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug26_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9940927624702454
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug27_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9841067790985107
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug27_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9855327010154724
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug27_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9793989658355713
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug27_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9886505603790283
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug28_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9926137924194336
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug28_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9951991438865662
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug28_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9862024188041687
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug28_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9897961020469666
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug29_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9864229559898376
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug29_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9905049204826355
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug29_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9818904399871826
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug29_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9753372073173523
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug30_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9821158647537231
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug30_2.wav",
+   "label": "Bdim",
+   "confidence": 0.8136200904846191
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug30_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9784902930259705
+  },
+  {
+   "file": "Bdim/Bdim_AcusticPlug30_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9772717952728271
+  },
+  {
+   "file": "Bdim/Bdim_AcusticVince_JO_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9973982572555542
+  },
+  {
+   "file": "Bdim/Bdim_AcusticVince_JO_2.wav",
+   "label": "Bdim",
+   "confidence": 0.5697701573371887
+  },
+  {
+   "file": "Bdim/Bdim_AcusticVince_JO_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9886970520019531
+  },
+  {
+   "file": "Bdim/Bdim_AcusticVince_JO_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9949157238006592
+  },
+  {
+   "file": "Bdim/Bdim_ClassicVince_JO_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9758375287055969
+  },
+  {
+   "file": "Bdim/Bdim_ClassicVince_JO_2.wav",
+   "label": "Bdim",
+   "confidence": 0.521245539188385
+  },
+  {
+   "file": "Bdim/Bdim_ClassicVince_JO_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9818168878555298
+  },
+  {
+   "file": "Bdim/Bdim_ClassicVince_JO_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9927309155464172
+  },
+  {
+   "file": "Bdim/Bdim_Classic_Jo_1.wav",
+   "label": "Bdim",
+   "confidence": 0.9970456957817078
+  },
+  {
+   "file": "Bdim/Bdim_Classic_Jo_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9848784804344177
+  },
+  {
+   "file": "Bdim/Bdim_Classic_Jo_3.wav",
+   "label": "Bdim",
+   "confidence": 0.9955270886421204
+  },
+  {
+   "file": "Bdim/Bdim_Classic_Jo_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9799085259437561
+  },
+  {
+   "file": "Bdim/Bdim_Electric1_LInda_1.wav",
+   "label": "Bdim",
+   "confidence": 0.7098615765571594
+  },
+  {
+   "file": "Bdim/Bdim_Electric1_LInda_2.wav",
+   "label": "Bdim",
+   "confidence": 0.9126803874969482
+  },
+  {
+   "file": "Bdim/Bdim_Electric1_LInda_3.wav",
+   "label": "Bdim",
+   "confidence": 0.6768006682395935
+  },
+  {
+   "file": "Bdim/Bdim_Electric1_LInda_4.wav",
+   "label": "Bdim",
+   "confidence": 0.9794101715087891
+  },
+  {
+   "file": "Bdim/Bdim_Electric2_LInda_1.wav",
+   "label": "Em",
+   "confidence": 0.3275394141674042
+  },
+  {
+   "file": "Bdim/Bdim_Electric2_LInda_2.wav",
+   "label": "Bdim",
+   "confidence": 0.601494312286377
+  },
+  {
+   "file": "Bdim/Bdim_Electric2_LInda_3.wav",
+   "label": "Em",
+   "confidence": 0.8377842307090759
+  },
+  {
+   "file": "Bdim/Bdim_Electric2_LInda_4.wav",
+   "label": "Bdim",
+   "confidence": 0.38949835300445557
+  },
+  {
+   "file": "C/C_AcusticPlug26_1.wav",
+   "label": "C",
+   "confidence": 0.9904451370239258
+  },
+  {
+   "file": "C/C_AcusticPlug26_2.wav",
+   "label": "C",
+   "confidence": 0.9876301884651184
+  },
+  {
+   "file": "C/C_AcusticPlug26_3.wav",
+   "label": "C",
+   "confidence": 0.9931738972663879
+  },
+  {
+   "file": "C/C_AcusticPlug26_4.wav",
+   "label": "C",
+   "confidence": 0.990993320941925
+  },
+  {
+   "file": "C/C_AcusticPlug27_1.wav",
+   "label": "C",
+   "confidence": 0.9907399415969849
+  },
+  {
+   "file": "C/C_AcusticPlug27_2.wav",
+   "label": "C",
+   "confidence": 0.9894493222236633
+  },
+  {
+   "file": "C/C_AcusticPlug27_3.wav",
+   "label": "C",
+   "confidence": 0.9884479641914368
+  },
+  {
+   "file": "C/C_AcusticPlug27_4.wav",
+   "label": "C",
+   "confidence": 0.9967477321624756
+  },
+  {
+   "file": "C/C_AcusticPlug28_1.wav",
+   "label": "C",
+   "confidence": 0.9944387674331665
+  },
+  {
+   "file": "C/C_AcusticPlug28_2.wav",
+   "label": "C",
+   "confidence": 0.9918113946914673
+  },
+  {
+   "file": "C/C_AcusticPlug28_3.wav",
+   "label": "C",
+   "confidence": 0.9946048855781555
+  },
+  {
+   "file": "C/C_AcusticPlug28_4.wav",
+   "label": "C",
+   "confidence": 0.9973183274269104
+  },
+  {
+   "file": "C/C_AcusticPlug29_1.wav",
+   "label": "C",
+   "confidence": 0.9901103377342224
+  },
+  {
+   "file": "C/C_AcusticPlug29_2.wav",
+   "label": "C",
+   "confidence": 0.9905611872673035
+  },
+  {
+   "file": "C/C_AcusticPlug29_3.wav",
+   "label": "C",
+   "confidence": 0.992466151714325
+  },
+  {
+   "file": "C/C_AcusticPlug29_4.wav",
+   "label": "C",
+   "confidence": 0.9949612617492676
+  },
+  {
+   "file": "C/C_AcusticPlug30_1.wav",
+   "label": "C",
+   "confidence": 0.698811411857605
+  },
+  {
+   "file": "C/C_AcusticPlug30_2.wav",
+   "label": "C",
+   "confidence": 0.6397409439086914
+  },
+  {
+   "file": "C/C_AcusticPlug30_3.wav",
+   "label": "C",
+   "confidence": 0.9811698794364929
+  },
+  {
+   "file": "C/C_AcusticPlug30_4.wav",
+   "label": "C",
+   "confidence": 0.9877433776855469
+  },
+  {
+   "file": "C/C_AcusticVince_JO_1.wav",
+   "label": "C",
+   "confidence": 0.9945447444915771
+  },
+  {
+   "file": "C/C_AcusticVince_JO_2.wav",
+   "label": "C",
+   "confidence": 0.9952414035797119
+  },
+  {
+   "file": "C/C_AcusticVince_JO_3.wav",
+   "label": "C",
+   "confidence": 0.9936084747314453
+  },
+  {
+   "file": "C/C_AcusticVince_JO_4.wav",
+   "label": "C",
+   "confidence": 0.9808547496795654
+  },
+  {
+   "file": "C/C_ClassicVince_JO_1.wav",
+   "label": "C",
+   "confidence": 0.9933711290359497
+  },
+  {
+   "file": "C/C_ClassicVince_JO_2.wav",
+   "label": "C",
+   "confidence": 0.9910119771957397
+  },
+  {
+   "file": "C/C_ClassicVince_JO_3.wav",
+   "label": "C",
+   "confidence": 0.9876074194908142
+  },
+  {
+   "file": "C/C_ClassicVince_JO_4.wav",
+   "label": "C",
+   "confidence": 0.9970243573188782
+  },
+  {
+   "file": "C/C_Classic_Jo_1.wav",
+   "label": "C",
+   "confidence": 0.9963642954826355
+  },
+  {
+   "file": "C/C_Classic_Jo_2.wav",
+   "label": "Am",
+   "confidence": 0.6023016571998596
+  },
+  {
+   "file": "C/C_Classic_Jo_3.wav",
+   "label": "C",
+   "confidence": 0.9954166412353516
+  },
+  {
+   "file": "C/C_Classic_Jo_4.wav",
+   "label": "C",
+   "confidence": 0.9954995512962341
+  },
+  {
+   "file": "C/C_Electric1_LInda_1.wav",
+   "label": "C",
+   "confidence": 0.9820844531059265
+  },
+  {
+   "file": "C/C_Electric1_LInda_2.wav",
+   "label": "C",
+   "confidence": 0.9937992691993713
+  },
+  {
+   "file": "C/C_Electric1_LInda_3.wav",
+   "label": "C",
+   "confidence": 0.9800099730491638
+  },
+  {
+   "file": "C/C_Electric1_LInda_4.wav",
+   "label": "C",
+   "confidence": 0.8059988021850586
+  },
+  {
+   "file": "C/C_Electric2_LInda_1.wav",
+   "label": "C",
+   "confidence": 0.9859647750854492
+  },
+  {
+   "file": "C/C_Electric2_LInda_2.wav",
+   "label": "C",
+   "confidence": 0.9849883317947388
+  },
+  {
+   "file": "C/C_Electric2_LInda_3.wav",
+   "label": "C",
+   "confidence": 0.9607909321784973
+  },
+  {
+   "file": "C/C_Electric2_LInda_4.wav",
+   "label": "C",
+   "confidence": 0.9921842217445374
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug26_1.wav",
+   "label": "Dm",
+   "confidence": 0.9941815733909607
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug26_2.wav",
+   "label": "Dm",
+   "confidence": 0.9944023489952087
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug26_3.wav",
+   "label": "Dm",
+   "confidence": 0.995941162109375
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug26_4.wav",
+   "label": "Dm",
+   "confidence": 0.9943104982376099
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug27_1.wav",
+   "label": "Dm",
+   "confidence": 0.9959698915481567
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug27_2.wav",
+   "label": "Dm",
+   "confidence": 0.9943395256996155
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug27_3.wav",
+   "label": "Dm",
+   "confidence": 0.9942130446434021
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug27_4.wav",
+   "label": "Dm",
+   "confidence": 0.9958471655845642
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug28_1.wav",
+   "label": "Dm",
+   "confidence": 0.9969639182090759
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug28_2.wav",
+   "label": "Dm",
+   "confidence": 0.9961561560630798
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug28_3.wav",
+   "label": "Dm",
+   "confidence": 0.9973816275596619
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug28_4.wav",
+   "label": "Dm",
+   "confidence": 0.9966729879379272
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug29 _1.wav",
+   "label": "Dm",
+   "confidence": 0.9942587614059448
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug29_2.wav",
+   "label": "Dm",
+   "confidence": 0.9966922998428345
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug29_3.wav",
+   "label": "Dm",
+   "confidence": 0.9974320530891418
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug29_4.wav",
+   "label": "Dm",
+   "confidence": 0.9975913763046265
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug30 _1.wav",
+   "label": "Dm",
+   "confidence": 0.974809467792511
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug30_2.wav",
+   "label": "Dm",
+   "confidence": 0.992649257183075
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug30_3.wav",
+   "label": "Dm",
+   "confidence": 0.9949405193328857
+  },
+  {
+   "file": "Dm/Dm_AcusticPlug30_4.wav",
+   "label": "Dm",
+   "confidence": 0.9974545836448669
+  },
+  {
+   "file": "Dm/Dm_AcusticVince_JO_1.wav",
+   "label": "Dm",
+   "confidence": 0.9984636306762695
+  },
+  {
+   "file": "Dm/Dm_AcusticVince_JO_2.wav",
+   "label": "Dm",
+   "confidence": 0.995425283908844
+  },
+  {
+   "file": "Dm/Dm_AcusticVince_JO_3.wav",
+   "label": "Dm",
+   "confidence": 0.9979103207588196
+  },
+  {
+   "file": "Dm/Dm_AcusticVince_JO_4.wav",
+   "label": "Dm",
+   "confidence": 0.9848920106887817
+  },
+  {
+   "file": "Dm/Dm_ClassicVince_JO_1.wav",
+   "label": "Dm",
+   "confidence": 0.998530387878418
+  },
+  {
+   "file": "Dm/Dm_ClassicVince_JO_2.wav",
+   "label": "Dm",
+   "confidence": 0.9975602626800537
+  },
+  {
+   "file": "Dm/Dm_ClassicVince_JO_3.wav",
+   "label": "Dm",
+   "confidence": 0.9959895014762878
+  },
+  {
+   "file": "Dm/Dm_ClassicVince_JO_4.wav",
+   "label": "Dm",
+   "confidence": 0.9966399669647217
+  },
+  {
+   "file": "Dm/Dm_Classic_Jo_1.wav",
+   "label": "Dm",
+   "confidence": 0.9955335855484009
+  },
+  {
+   "file": "Dm/Dm_Classic_Jo_2.wav",
+   "label": "Dm",
+   "confidence": 0.9876092672348022
+  },
+  {
+   "file": "Dm/Dm_Classic_Jo_3.wav",
+   "label": "Dm",
+   "confidence": 0.9951504468917847
+  },
+  {
+   "file": "Dm/Dm_Classic_Jo_4.wav",
+   "label": "Dm",
+   "confidence": 0.9952083230018616
+  },
+  {
+   "file": "Dm/Dm_Electric1_LInda_1.wav",
+   "label": "Dm",
+   "confidence": 0.985797107219696
+  },
+  {
+   "file": "Dm/Dm_Electric1_LInda_2.wav",
+   "label": "Dm",
+   "confidence": 0.9870997071266174
+  },
+  {
+   "file": "Dm/Dm_Electric1_LInda_3.wav",
+   "label": "Dm",
+   "confidence": 0.9945701956748962
+  },
+  {
+   "file": "Dm/Dm_Electric1_LInda_4.wav",
+   "label": "Dm",
+   "confidence": 0.9954156875610352
+  },
+  {
+   "file": "Dm/Dm_Electric2_LInda_1.wav",
+   "label": "Dm",
+   "confidence": 0.9679855108261108
+  },
+  {
+   "file": "Dm/Dm_Electric2_LInda_2.wav",
+   "label": "Dm",
+   "confidence": 0.5648044347763062
+  },
+  {
+   "file": "Dm/Dm_Electric2_LInda_3.wav",
+   "label": "Dm",
+   "confidence": 0.9967572093009949
+  },
+  {
+   "file": "Dm/Dm_Electric2_LInda_4.wav",
+   "label": "Dm",
+   "confidence": 0.993966281414032
+  },
+  {
+   "file": "Em/Em_AcusticPlug26_1.wav",
+   "label": "Em",
+   "confidence": 0.9811222553253174
+  },
+  {
+   "file": "Em/Em_AcusticPlug26_2.wav",
+   "label": "Em",
+   "confidence": 0.9883567690849304
+  },
+  {
+   "file": "Em/Em_AcusticPlug26_3.wav",
+   "label": "Em",
+   "confidence": 0.9878677129745483
+  },
+  {
+   "file": "Em/Em_AcusticPlug26_4.wav",
+   "label": "Em",
+   "confidence": 0.9910026788711548
+  },
+  {
+   "file": "Em/Em_AcusticPlug27_1.wav",
+   "label": "Em",
+   "confidence": 0.9860208630561829
+  },
+  {
+   "file": "Em/Em_AcusticPlug27_2.wav",
+   "label": "Em",
+   "confidence": 0.9937729239463806
+  },
+  {
+   "file": "Em/Em_AcusticPlug27_3.wav",
+   "label": "Em",
+   "confidence": 0.9877601265907288
+  },
+  {
+   "file": "Em/Em_AcusticPlug27_4.wav",
+   "label": "Em",
+   "confidence": 0.99470454454422
+  },
+  {
+   "file": "Em/Em_AcusticPlug28_1.wav",
+   "label": "Em",
+   "confidence": 0.9885397553443909
+  },
+  {
+   "file": "Em/Em_AcusticPlug28_2.wav",
+   "label": "Em",
+   "confidence": 0.9965885877609253
+  },
+  {
+   "file": "Em/Em_AcusticPlug28_3.wav",
+   "label": "Em",
+   "confidence": 0.9870249032974243
+  },
+  {
+   "file": "Em/Em_AcusticPlug28_4.wav",
+   "label": "Em",
+   "confidence": 0.9954615235328674
+  },
+  {
+   "file": "Em/Em_AcusticPlug29_1.wav",
+   "label": "Em",
+   "confidence": 0.9953463673591614
+  },
+  {
+   "file": "Em/Em_AcusticPlug29_2.wav",
+   "label": "Em",
+   "confidence": 0.9952210783958435
+  },
+  {
+   "file": "Em/Em_AcusticPlug29_3.wav",
+   "label": "Em",
+   "confidence": 0.9941179752349854
+  },
+  {
+   "file": "Em/Em_AcusticPlug29_4.wav",
+   "label": "Em",
+   "confidence": 0.9965741634368896
+  },
+  {
+   "file": "Em/Em_AcusticPlug30_1.wav",
+   "label": "Em",
+   "confidence": 0.9871355891227722
+  },
+  {
+   "file": "Em/Em_AcusticPlug30_2.wav",
+   "label": "Em",
+   "confidence": 0.986322283744812
+  },
+  {
+   "file": "Em/Em_AcusticPlug30_3.wav",
+   "label": "Em",
+   "confidence": 0.9897974729537964
+  },
+  {
+   "file": "Em/Em_AcusticPlug30_4.wav",
+   "label": "Em",
+   "confidence": 0.9981474876403809
+  },
+  {
+   "file": "Em/Em_AcusticVince_JO_1.wav",
+   "label": "Em",
+   "confidence": 0.9885899424552917
+  },
+  {
+   "file": "Em/Em_AcusticVince_JO_2.wav",
+   "label": "Em",
+   "confidence": 0.4742988049983978
+  },
+  {
+   "file": "Em/Em_AcusticVince_JO_3.wav",
+   "label": "Em",
+   "confidence": 0.9965869188308716
+  },
+  {
+   "file": "Em/Em_AcusticVince_JO_4.wav",
+   "label": "Em",
+   "confidence": 0.9811021685600281
+  },
+  {
+   "file": "Em/Em_ClassicVince_JO_1.wav",
+   "label": "Em",
+   "confidence": 0.9777887463569641
+  },
+  {
+   "file": "Em/Em_ClassicVince_JO_2.wav",
+   "label": "Em",
+   "confidence": 0.9936206936836243
+  },
+  {
+   "file": "Em/Em_ClassicVince_JO_3.wav",
+   "label": "Em",
+   "confidence": 0.9934771656990051
+  },
+  {
+   "file": "Em/Em_ClassicVince_JO_4.wav",
+   "label": "Em",
+   "confidence": 0.9498077630996704
+  },
+  {
+   "file": "Em/Em_Classic_Jo_1.wav",
+   "label": "Em",
+   "confidence": 0.9873948097229004
+  },
+  {
+   "file": "Em/Em_Classic_Jo_2.wav",
+   "label": "Em",
+   "confidence": 0.9893366098403931
+  },
+  {
+   "file": "Em/Em_Classic_Jo_3.wav",
+   "label": "Em",
+   "confidence": 0.9542921781539917
+  },
+  {
+   "file": "Em/Em_Classic_Jo_4.wav",
+   "label": "Em",
+   "confidence": 0.6280597448348999
+  },
+  {
+   "file": "Em/Em_Electric1_LInda_1.wav",
+   "label": "Em",
+   "confidence": 0.9859631657600403
+  },
+  {
+   "file": "Em/Em_Electric1_LInda_2.wav",
+   "label": "Em",
+   "confidence": 0.9885638952255249
+  },
+  {
+   "file": "Em/Em_Electric1_LInda_3.wav",
+   "label": "Em",
+   "confidence": 0.9975460171699524
+  },
+  {
+   "file": "Em/Em_Electric1_LInda_4.wav",
+   "label": "Em",
+   "confidence": 0.8122132420539856
+  },
+  {
+   "file": "Em/Em_Electric2_LInda_1..wav",
+   "label": "Em",
+   "confidence": 0.9912737011909485
+  },
+  {
+   "file": "Em/Em_Electric2_LInda_2.wav",
+   "label": "Em",
+   "confidence": 0.936081051826477
+  },
+  {
+   "file": "Em/Em_Electric2_LInda_3.wav",
+   "label": "Em",
+   "confidence": 0.9525373578071594
+  },
+  {
+   "file": "Em/Em_Electric2_LInda_4..wav",
+   "label": "Em",
+   "confidence": 0.6195210814476013
+  },
+  {
+   "file": "F/F_AcusticPlug26_1.wav",
+   "label": "F",
+   "confidence": 0.9818301796913147
+  },
+  {
+   "file": "F/F_AcusticPlug26_2.wav",
+   "label": "F",
+   "confidence": 0.9953302145004272
+  },
+  {
+   "file": "F/F_AcusticPlug26_3.wav",
+   "label": "F",
+   "confidence": 0.9854936599731445
+  },
+  {
+   "file": "F/F_AcusticPlug26_4.wav",
+   "label": "F",
+   "confidence": 0.9817755222320557
+  },
+  {
+   "file": "F/F_AcusticPlug27_1.wav",
+   "label": "F",
+   "confidence": 0.9858695268630981
+  },
+  {
+   "file": "F/F_AcusticPlug27_2.wav",
+   "label": "F",
+   "confidence": 0.9942026734352112
+  },
+  {
+   "file": "F/F_AcusticPlug27_3.wav",
+   "label": "F",
+   "confidence": 0.9888882040977478
+  },
+  {
+   "file": "F/F_AcusticPlug27_4.wav",
+   "label": "F",
+   "confidence": 0.9866655468940735
+  },
+  {
+   "file": "F/F_AcusticPlug28_1.wav",
+   "label": "F",
+   "confidence": 0.992038369178772
+  },
+  {
+   "file": "F/F_AcusticPlug28_2.wav",
+   "label": "F",
+   "confidence": 0.9964442849159241
+  },
+  {
+   "file": "F/F_AcusticPlug28_3.wav",
+   "label": "F",
+   "confidence": 0.991776704788208
+  },
+  {
+   "file": "F/F_AcusticPlug28_4.wav",
+   "label": "F",
+   "confidence": 0.9966152310371399
+  },
+  {
+   "file": "F/F_AcusticPlug29_1.wav",
+   "label": "F",
+   "confidence": 0.9932119846343994
+  },
+  {
+   "file": "F/F_AcusticPlug29_2.wav",
+   "label": "F",
+   "confidence": 0.9966088533401489
+  },
+  {
+   "file": "F/F_AcusticPlug29_3.wav",
+   "label": "F",
+   "confidence": 0.9929758310317993
+  },
+  {
+   "file": "F/F_AcusticPlug29_4.wav",
+   "label": "F",
+   "confidence": 0.9816052317619324
+  },
+  {
+   "file": "F/F_AcusticPlug30_1.wav",
+   "label": "F",
+   "confidence": 0.9845920205116272
+  },
+  {
+   "file": "F/F_AcusticPlug30_2.wav",
+   "label": "F",
+   "confidence": 0.98518306016922
+  },
+  {
+   "file": "F/F_AcusticPlug30_3.wav",
+   "label": "F",
+   "confidence": 0.9825037121772766
+  },
+  {
+   "file": "F/F_AcusticPlug30_4.wav",
+   "label": "F",
+   "confidence": 0.7847740650177002
+  },
+  {
+   "file": "F/F_AcusticVince_JO_1.wav",
+   "label": "F",
+   "confidence": 0.9958894848823547
+  },
+  {
+   "file": "F/F_AcusticVince_JO_2.wav",
+   "label": "F",
+   "confidence": 0.9938494563102722
+  },
+  {
+   "file": "F/F_AcusticVince_JO_3.wav",
+   "label": "F",
+   "confidence": 0.9934919476509094
+  },
+  {
+   "file": "F/F_AcusticVince_JO_4.wav",
+   "label": "F",
+   "confidence": 0.9928846955299377
+  },
+  {
+   "file": "F/F_ClassicVince_JO_1.wav",
+   "label": "F",
+   "confidence": 0.7669445872306824
+  },
+  {
+   "file": "F/F_ClassicVince_JO_2.wav",
+   "label": "F",
+   "confidence": 0.9483230710029602
+  },
+  {
+   "file": "F/F_ClassicVince_JO_3.wav",
+   "label": "F",
+   "confidence": 0.99149090051651
+  },
+  {
+   "file": "F/F_ClassicVince_JO_4.wav",
+   "label": "F",
+   "confidence": 0.9953492283821106
+  },
+  {
+   "file": "F/F_Classic_Jo_1..wav",
+   "label": "F",
+   "confidence": 0.9850397109985352
+  },
+  {
+   "file": "F/F_Classic_Jo_2.wav",
+   "label": "F",
+   "confidence": 0.9971256852149963
+  },
+  {
+   "file": "F/F_Classic_Jo_3.wav",
+   "label": "F",
+   "confidence": 0.99368816614151
+  },
+  {
+   "file": "F/F_Classic_Jo_4.wav",
+   "label": "F",
+   "confidence": 0.9673182368278503
+  },
+  {
+   "file": "F/F_Electric1_LInda_1.wav",
+   "label": "F",
+   "confidence": 0.9925468564033508
+  },
+  {
+   "file": "F/F_Electric1_LInda_2.wav",
+   "label": "F",
+   "confidence": 0.955669641494751
+  },
+  {
+   "file": "F/F_Electric1_LInda_3.wav",
+   "label": "F",
+   "confidence": 0.9652841687202454
+  },
+  {
+   "file": "F/F_Electric1_LInda_4.wav",
+   "label": "Am",
+   "confidence": 0.439050555229187
+  },
+  {
+   "file": "F/F_Electric2_LInda_1.wav",
+   "label": "F",
+   "confidence": 0.5921338796615601
+  },
+  {
+   "file": "F/F_Electric2_LInda_2.wav",
+   "label": "F",
+   "confidence": 0.8876833915710449
+  },
+  {
+   "file": "F/F_Electric2_LInda_3.wav",
+   "label": "F",
+   "confidence": 0.8078535199165344
+  },
+  {
+   "file": "F/F_Electric2_LInda_4.wav",
+   "label": "F",
+   "confidence": 0.9803973436355591
+  },
+  {
+   "file": "G/G_AcusticPlug26_1.wav",
+   "label": "G",
+   "confidence": 0.9913325905799866
+  },
+  {
+   "file": "G/G_AcusticPlug26_2.wav",
+   "label": "G",
+   "confidence": 0.9917213320732117
+  },
+  {
+   "file": "G/G_AcusticPlug26_3.wav",
+   "label": "G",
+   "confidence": 0.9898213148117065
+  },
+  {
+   "file": "G/G_AcusticPlug26_4.wav",
+   "label": "G",
+   "confidence": 0.9966568946838379
+  },
+  {
+   "file": "G/G_AcusticPlug27_1.wav",
+   "label": "G",
+   "confidence": 0.9967201352119446
+  },
+  {
+   "file": "G/G_AcusticPlug27_2.wav",
+   "label": "G",
+   "confidence": 0.9926120638847351
+  },
+  {
+   "file": "G/G_AcusticPlug27_3.wav",
+   "label": "G",
+   "confidence": 0.9977890253067017
+  },
+  {
+   "file": "G/G_AcusticPlug27_4.wav",
+   "label": "G",
+   "confidence": 0.9979211688041687
+  },
+  {
+   "file": "G/G_AcusticPlug28_1.wav",
+   "label": "G",
+   "confidence": 0.9982343912124634
+  },
+  {
+   "file": "G/G_AcusticPlug28_2.wav",
+   "label": "G",
+   "confidence": 0.9951506853103638
+  },
+  {
+   "file": "G/G_AcusticPlug28_3.wav",
+   "label": "G",
+   "confidence": 0.9955376386642456
+  },
+  {
+   "file": "G/G_AcusticPlug28_4.wav",
+   "label": "G",
+   "confidence": 0.9937547445297241
+  },
+  {
+   "file": "G/G_AcusticPlug29_1.wav",
+   "label": "G",
+   "confidence": 0.9988886713981628
+  },
+  {
+   "file": "G/G_AcusticPlug29_2.wav",
+   "label": "G",
+   "confidence": 0.9947057366371155
+  },
+  {
+   "file": "G/G_AcusticPlug29_3.wav",
+   "label": "G",
+   "confidence": 0.9963381290435791
+  },
+  {
+   "file": "G/G_AcusticPlug29_4.wav",
+   "label": "G",
+   "confidence": 0.9720749258995056
+  },
+  {
+   "file": "G/G_AcusticPlug30_1.wav",
+   "label": "G",
+   "confidence": 0.9830642342567444
+  },
+  {
+   "file": "G/G_AcusticPlug30_2.wav",
+   "label": "G",
+   "confidence": 0.9120845794677734
+  },
+  {
+   "file": "G/G_AcusticPlug30_3.wav",
+   "label": "G",
+   "confidence": 0.9468578100204468
+  },
+  {
+   "file": "G/G_AcusticPlug30_4.wav",
+   "label": "G",
+   "confidence": 0.9783689975738525
+  },
+  {
+   "file": "G/G_AcusticVince_JO_1.wav",
+   "label": "G",
+   "confidence": 0.9965426325798035
+  },
+  {
+   "file": "G/G_AcusticVince_JO_2.wav",
+   "label": "G",
+   "confidence": 0.999646782875061
+  },
+  {
+   "file": "G/G_AcusticVince_JO_3.wav",
+   "label": "G",
+   "confidence": 0.9858923554420471
+  },
+  {
+   "file": "G/G_AcusticVince_JO_4.wav",
+   "label": "G",
+   "confidence": 0.6360591053962708
+  },
+  {
+   "file": "G/G_ClassicVince_JO_1.wav",
+   "label": "G",
+   "confidence": 0.988987386226654
+  },
+  {
+   "file": "G/G_ClassicVince_JO_2.wav",
+   "label": "G",
+   "confidence": 0.9867188334465027
+  },
+  {
+   "file": "G/G_ClassicVince_JO_3.wav",
+   "label": "G",
+   "confidence": 0.9924235343933105
+  },
+  {
+   "file": "G/G_ClassicVince_JO_4.wav",
+   "label": "G",
+   "confidence": 0.9996371269226074
+  },
+  {
+   "file": "G/G_Classic_Jo_1.wav",
+   "label": "G",
+   "confidence": 0.9929335117340088
+  },
+  {
+   "file": "G/G_Classic_Jo_2.wav",
+   "label": "G",
+   "confidence": 0.9921754002571106
+  },
+  {
+   "file": "G/G_Classic_Jo_3.wav",
+   "label": "G",
+   "confidence": 0.98414546251297
+  },
+  {
+   "file": "G/G_Classic_Jo_4.wav",
+   "label": "G",
+   "confidence": 0.9692877531051636
+  },
+  {
+   "file": "G/G_Electric1_LInda_1.wav",
+   "label": "G",
+   "confidence": 0.9015719890594482
+  },
+  {
+   "file": "G/G_Electric1_LInda_2.wav",
+   "label": "Dm",
+   "confidence": 0.8789916038513184
+  },
+  {
+   "file": "G/G_Electric1_LInda_3.wav",
+   "label": "G",
+   "confidence": 0.8846197128295898
+  },
+  {
+   "file": "G/G_Electric1_LInda_4.wav",
+   "label": "G",
+   "confidence": 0.9991254210472107
+  },
+  {
+   "file": "G/G_Electric2_LInda_1.wav",
+   "label": "Dm",
+   "confidence": 0.6167317032814026
+  },
+  {
+   "file": "G/G_Electric2_LInda_2.wav",
+   "label": "G",
+   "confidence": 0.39441823959350586
+  },
+  {
+   "file": "G/G_Electric2_LInda_3.wav",
+   "label": "G",
+   "confidence": 0.6241393685340881
+  },
+  {
+   "file": "G/G_Electric2_LInda_4.wav",
+   "label": "Em",
+   "confidence": 0.5201392769813538
+  }
+ ]
+}

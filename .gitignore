@@ -1,5 +1,4 @@
-._*
-.secrets.toml
-chordfinder/logs/
 __pycache__/
-db.sqlite3
+.venv/
+.pytest_cache/
+.ruff_cache/
