@@ -34,13 +34,17 @@ export = [
     "onnx>=1.16,<1.18",  # 1.18+ needs ml_dtypes newer than TensorFlow 2.16 allows
 ]
 
+[tool.uv]
+# e2e is default so that `uv sync` gives mypy the Playwright types everywhere; browsers are not downloaded.
+default-groups = ["dev", "e2e"]
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-# Browser tests are slow and need the web build: `uv run --group e2e pytest -m e2e`.
+# Browser tests are slow and need the web build: `uv run pytest -m e2e`.
 addopts = "-m 'not e2e'"
 markers = ["e2e: Chromium + exported Godot web build"]
 

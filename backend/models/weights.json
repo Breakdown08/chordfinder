@@ -1,0 +1,16 @@
+{
+  "repo": "Breakdown08/chordfinder",
+  "tag": "weights-v1",
+  "files": {
+    "chord-cnn.onnx": {
+      "sha256": "f7c8bc9f9bd2d9a3c06071974749e5e43876b5cf7acb00593d4d38dd3ab99dab",
+      "size": 221189,
+      "runtime": true
+    },
+    "chord-cnn.keras": {
+      "sha256": "25a8696a483492cb7116bf6fd9143e2e389778e1e3ac4a8e6db0aefcad298cb0",
+      "size": 709542,
+      "runtime": false
+    }
+  }
+}

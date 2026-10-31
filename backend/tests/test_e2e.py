@@ -1,7 +1,7 @@
 """End-to-end: Chromium fake microphone -> Godot web build -> /ws/recognize -> chord on screen.
 
     godot --headless --path ../frontend --export-release Web build/web/index.html
-    uv run --group e2e pytest -m e2e -s
+    uv run pytest -m e2e -s
 
 The client prints "status: ..." and "chord: <stable chord>" to the browser console; the tests read it.
 Chromium is the system one (CHORDFINDER_CHROMIUM or `chromium` on PATH): Playwright downloads nothing.

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read  # enough to download release assets of this repository
+
+jobs:
+  backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check
+      - run: uv run ruff format --check
+      - run: uv run mypy
+      - name: Model weights (GitHub Release, pinned by SHA-256 in models/weights.json)
+        run: uv run chordfinder weights
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      # Tests that need the dataset (Kaggle, licence unknown) skip here: accuracy, parity, latency.
+      - run: uv run pytest
+
+  frontend:
+    runs-on: ubuntu-24.04
+    env:
+      GODOT: 4.5.1-stable  # same engine as the export templates on the dev machine (nixpkgs pin)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Godot
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/$GODOT/Godot_v${GODOT}_linux.x86_64.zip"
+          unzip -q godot.zip
+          mv "Godot_v${GODOT}_linux.x86_64" "$RUNNER_TEMP/godot"
+      # Import builds the class cache (class_name Frames, Reply) the test relies on.
+      - run: timeout 300 "$RUNNER_TEMP/godot" --headless --path frontend --import
+      # A script that fails to compile leaves Godot running: the timeout turns that into a failure.
+      - run: timeout 120 "$RUNNER_TEMP/godot" --headless --path frontend -s tests/test_client.gd
