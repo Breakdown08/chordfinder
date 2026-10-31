@@ -7,18 +7,21 @@ import time
 
 import numpy as np
 
-t0 = time.perf_counter()
+from chordfinder.audio import Audio
+
+t0: float = time.perf_counter()
 from chordfinder.model import ChordModel  # noqa: E402
 
-rng = np.random.default_rng(0)
-y = (0.3 * rng.standard_normal(16000)).astype(np.float32)
-model = ChordModel()
+rng: np.random.Generator = np.random.default_rng(0)
+y: Audio = (0.3 * rng.standard_normal(16000)).astype(np.float32)
+model: ChordModel = ChordModel()
 model.predict(y)  # librosa is imported lazily here, so the first answer belongs to the cold start
-cold = time.perf_counter() - t0
+cold: float = time.perf_counter() - t0
 
-times = []
+times: list[float] = []
+_: int
 for _ in range(300):
-    t = time.perf_counter()
+    t: float = time.perf_counter()
     model.predict(y)
     times.append((time.perf_counter() - t) * 1000)
 print(f"cold start {cold:.2f} s (import + load + first answer)")

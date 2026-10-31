@@ -2,3 +2,9 @@ __pycache__/
 .venv/
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
+
+# Model weights and the dataset are downloaded, never committed (see README).
+backend/models/*.keras
+backend/models/*.onnx
+datasets/

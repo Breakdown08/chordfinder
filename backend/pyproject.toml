@@ -2,7 +2,6 @@
 name = "chordfinder"
 version = "0.2.0"
 description = "Guitar chord recognition (CNN on log-mel spectrograms) served to a Godot web game"
-readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     # numpy<2: the export group pins TensorFlow 2.16.2, and uv resolves all groups together.
@@ -10,6 +9,8 @@ dependencies = [
     "scipy>=1.11",
     "librosa==0.10.2.post1",
     "onnxruntime>=1.19",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
 ]
 
 [project.scripts]
@@ -19,6 +20,8 @@ chordfinder = "chordfinder.cli:main"
 dev = [
     "pytest>=8",
     "ruff>=0.7",
+    "mypy>=1.13",
+    "httpx>=0.27",
 ]
 # Keras -> ONNX only (`chordfinder export`); never needed at runtime.
 export = [
@@ -39,4 +42,16 @@ testpaths = ["tests"]
 line-length = 110
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "B", "UP"]
+select = ["E", "F", "I", "B", "UP", "ANN"]
+
+# Every variable, parameter and return value is typed (Kirill's rule). mypy --strict covers
+# signatures; tests/test_annotations.py covers variables, which no linter checks.
+[tool.mypy]
+strict = true
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+files = ["src", "tests", "tools"]
+
+[[tool.mypy.overrides]]
+module = ["librosa.*", "scipy.*", "onnxruntime.*", "tf2onnx.*", "keras.*", "tensorflow.*"]
+ignore_missing_imports = true
