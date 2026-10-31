@@ -2,6 +2,7 @@
 
     godot --headless --path ../frontend --export-release Web build/web/index.html
     uv run pytest -m e2e -s
+    CHORDFINDER_URL=http://localhost:8000 uv run pytest -m e2e -s   # a running server, e.g. the Docker image
 
 The client prints "status: ..." and "chord: <stable chord>" to the browser console; the tests read it.
 Chromium is the system one (CHORDFINDER_CHROMIUM or `chromium` on PATH): Playwright downloads nothing.
@@ -26,20 +27,24 @@ from chordfinder.server import WEB, app
 from tests.conftest import dataset_file, needs_dataset, needs_model, sine
 from tests.test_server import CHORDS, first_file
 
-pytestmark: list[pytest.MarkDecorator] = [pytest.mark.e2e, needs_model]
+URL: str | None = os.environ.get("CHORDFINDER_URL")  # set: test that server, else start the app here
+pytestmark: list[pytest.MarkDecorator] = [pytest.mark.e2e] + ([] if URL else [needs_model])
 RATE: int = 48000
 LEAD_SECONDS: float = 2.0  # silence before the strum: the page settles, the client must show nothing
 LISTEN_SECONDS: float = 5.0
 os.environ.setdefault("PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS", "1")  # NixOS: its ldd check misfires
 CHROMIUM: str | None = os.environ.get("CHORDFINDER_CHROMIUM") or shutil.which("chromium")
 
-if not (WEB / "index.wasm").is_file() or CHROMIUM is None:
+if (URL is None and not (WEB / "index.wasm").is_file()) or CHROMIUM is None:
     pytest.skip("needs the exported web build and Chromium", allow_module_level=True)
 
 
 @pytest.fixture(scope="module")
 def base() -> Iterator[str]:
-    """The real app (model, web build) on a free port, in this process."""
+    """The real app (model, web build) on a free port, in this process; or the server at CHORDFINDER_URL."""
+    if URL:
+        yield URL.rstrip("/")
+        return
     s: socket.socket
     with socket.socket() as s:
         s.bind(("127.0.0.1", 0))

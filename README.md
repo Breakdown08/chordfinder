@@ -26,10 +26,14 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 |---|---|---|---|
 | Accuracy, test split (320 files) | 95.9% | 95.9%; ONNX matches Keras on 320/320 labels | `chordfinder eval`, `tests/test_parity.py` |
 | Inference per window | 53 ms (TensorFlow) | 1.2 ms (ONNX Runtime) | `tools/bench.py` |
-| Cold start to first answer | 2.3 s | 0.86 s | `tools/bench.py` |
+| Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 53 backend, 16 client checks, 3 browser e2e | CI |
+| Tests | 0 | 53 backend, 16 client checks, 3 browser e2e (2 of them in CI against the Docker image; the third needs the dataset) | CI |
+
+Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
+after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
+image compiles them at build time.
 
 The extra 0.3 s is the price of smoothing: a chord is shown after three agreeing windows (125 ms step). Two windows
 would be faster but bring the false chords back; speed has to come from retraining, not from tuning.
@@ -52,7 +56,18 @@ microphone ─► Godot web client ─► /ws/recognize ─► resample to 16 kH
 
 ## Run
 
-Needs [uv](https://docs.astral.sh/uv/) and [Godot 4.5.1](https://godotengine.org/) with web export templates.
+With Docker — the image builds the web client, installs the server and downloads the weights (SHA-256 checked):
+
+```sh
+docker build -t chordfinder .
+docker run --rm -p 8000:8000 chordfinder
+```
+
+Open http://localhost:8000/, allow the microphone, play a chord. The image is 255 MB to download: Python
+runtime dependencies only, no TensorFlow, no Godot.
+
+Without Docker: needs [uv](https://docs.astral.sh/uv/) and [Godot 4.5.1](https://godotengine.org/) with web
+export templates.
 
 ```sh
 (cd backend && uv sync && uv run chordfinder weights)
@@ -68,7 +83,10 @@ Open http://localhost:8000/, allow the microphone, play a chord.
 (cd backend && uv run ruff check && uv run mypy && uv run pytest)
 godot --headless --path frontend -s tests/test_client.gd   # client: wire format, replies, strict typing
 (cd backend && uv run pytest -m e2e -s)                     # Chromium with a fake microphone → web build → server
+(cd backend && CHORDFINDER_URL=http://localhost:8000 uv run pytest -m e2e -s)   # the same against a running container
 ```
+
+CI builds the image, starts it and runs the browser tests against it.
 
 Accuracy, parity and latency tests need the dataset and skip without it. Its licence is unknown, so it is not
 included: download it from Kaggle and point `CHORDFINDER_DATASET` at its `data/` directory

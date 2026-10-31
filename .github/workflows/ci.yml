@@ -45,3 +45,39 @@ jobs:
       - run: timeout 300 "$RUNNER_TEMP/godot" --headless --path frontend --import
       # A script that fails to compile leaves Godot running: the timeout turns that into a failure.
       - run: timeout 120 "$RUNNER_TEMP/godot" --headless --path frontend -s tests/test_client.gd
+
+  # The image a user runs: Godot web export + server + weights. e2e drives Chrome against it.
+  docker:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: chordfinder
+          secrets: github_token=${{ github.token }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - run: docker run -d --name cf -p 8000:8000 chordfinder
+      - name: Wait until healthy
+        run: |
+          for _ in $(seq 30); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' cf)" = healthy ] && exit 0
+            sleep 2
+          done
+          exit 1
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+        working-directory: backend
+      # Without the dataset: silence and a denied microphone; recognition needs recordings.
+      - run: uv run pytest -m e2e -s
+        working-directory: backend
+        env:
+          CHORDFINDER_URL: http://localhost:8000
+          CHORDFINDER_CHROMIUM: /usr/bin/google-chrome
+      - if: failure()
+        run: docker logs cf

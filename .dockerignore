@@ -1,0 +1,12 @@
+# Allowlist: the build context is only what the image needs.
+*
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/src
+!backend/models/meta.json
+!backend/models/weights.json
+!frontend
+frontend/.godot
+frontend/build
+frontend/tests
+**/__pycache__
