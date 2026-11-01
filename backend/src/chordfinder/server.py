@@ -5,15 +5,18 @@
 WebSocket /ws/recognize: first a text frame {"sample_rate": 48000}, then binary frames of mono
 float32 little-endian samples at that rate (stream.HOP_SECONDS each, 125 ms). Every frame gets a
 StreamReply about the last second of audio. POST /v1/predict answers for one clip.
+CHORDFINDER_LOG=manual.jsonl appends every stream reply with a timestamp (manual check, tools/strums.py).
 Everything else is the Godot web build (frontend/build/web, or CHORDFINDER_WEB), when exported.
 """
 
 import asyncio
+import json
 import os
+import time
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, TextIO
 
 import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
@@ -30,6 +33,7 @@ MAX_CLIP_SECONDS: float = 10.0
 # Single-threaded Godot build: no SharedArrayBuffer, so no COOP/COEP headers are needed.
 REPO: Path = Path(__file__).resolve().parents[3]
 WEB: Path = Path(os.environ.get("CHORDFINDER_WEB", REPO / "frontend/build/web"))
+LOG: Path | None = Path(os.environ["CHORDFINDER_LOG"]) if os.environ.get("CHORDFINDER_LOG") else None
 
 
 @asynccontextmanager
@@ -63,6 +67,14 @@ class Clip(BaseModel):
 
 class ClipReply(Recognition):
     probabilities: dict[str, float] | None
+
+
+def log_reply(reply: StreamReply) -> None:
+    if LOG is None:
+        return
+    f: TextIO
+    with LOG.open("a") as f:
+        f.write(json.dumps({"ts": time.time(), **reply.model_dump()}) + "\n")
 
 
 def get_model(request: Request) -> ChordModel:
@@ -131,6 +143,7 @@ async def recognize_stream(ws: WebSocket) -> None:
                 stable=stabilizer.push(chord, confidence),
                 samples=stream.total,
             )
+            log_reply(reply)
             await ws.send_json(reply.model_dump())
     except WebSocketDisconnect:
         return
