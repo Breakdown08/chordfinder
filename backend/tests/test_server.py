@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from httpx import Response
 from starlette.testclient import WebSocketTestSession
@@ -12,7 +13,7 @@ from starlette.testclient import WebSocketTestSession
 from chordfinder import audio
 from chordfinder.audio import Audio
 from chordfinder.evaluate import load
-from chordfinder.server import ClipReply, StreamReply
+from chordfinder.server import ClipReply, StreamReply, WebBuild
 from chordfinder.stream import HOP_SECONDS
 from tests.conftest import dataset_file, needs_dataset, sine
 
@@ -119,3 +120,11 @@ def test_ws_chord_becomes_stable(client: TestClient, chord: str) -> None:
         replies: list[StreamReply] = send(ws, y)
     stable: list[str] = [r.stable for r in replies if r.stable is not None]
     assert stable and set(stable) == {chord}
+
+
+def test_web_build_is_revalidated(tmp_path: Path) -> None:
+    (tmp_path / "index.pck").write_bytes(b"build")
+    web: FastAPI = FastAPI()
+    web.mount("/", WebBuild(directory=tmp_path, html=True))
+    response: Response = TestClient(web).get("/index.pck")
+    assert response.content == b"build" and response.headers["cache-control"] == "no-cache"

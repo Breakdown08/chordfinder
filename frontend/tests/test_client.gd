@@ -57,6 +57,7 @@ func _init() -> void:
 	m.record()
 	m.heard(2, 1.0)
 	check(m.strums == 2 and not m.tail_over(9.0), "measure: two strums are not a take")
+	check(m.counter() == "Am  2/3", "measure: big counter")
 	m.heard(3, 10.0)
 	check(not m.tail_over(11.0), "measure: the last strum rings out on the record")
 	check(m.tail_over(10.0 + Measure.TAIL_SECONDS), "measure: then the take ends")

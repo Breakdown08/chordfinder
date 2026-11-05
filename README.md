@@ -30,7 +30,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 62 backend, 34 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
+| Tests | 0 | 63 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker

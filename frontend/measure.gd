@@ -60,6 +60,11 @@ func text() -> String:
 	return "Готово"
 
 
+## The big counter, readable from behind a guitar.
+func counter() -> String:
+	return "%s  %d/%d" % [chord(), mini(strums, STRUMS), STRUMS] if state == State.RECORDING else ""
+
+
 func _reset() -> void:
 	strums = 0
 	_last_strum_at = -1.0

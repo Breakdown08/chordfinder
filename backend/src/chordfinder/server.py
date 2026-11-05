@@ -25,7 +25,8 @@ import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
-from starlette.types import Message
+from starlette.responses import Response
+from starlette.types import Message, Scope
 
 from chordfinder import audio
 from chordfinder.audio import Audio
@@ -196,6 +197,15 @@ async def recognize_stream(ws: WebSocket) -> None:
         return
 
 
+class WebBuild(StaticFiles):
+    """Revalidate every file: the build keeps its names, so a cached index.pck is an old client."""
+
+    async def get_response(self, path: str, scope: Scope) -> Response:
+        response: Response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
 # Last: a mount at "/" would shadow the routes above.
 if (WEB / "index.html").is_file():
-    app.mount("/", StaticFiles(directory=WEB, html=True), name="web")
+    app.mount("/", WebBuild(directory=WEB, html=True), name="web")

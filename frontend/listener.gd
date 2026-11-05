@@ -27,6 +27,7 @@ var _bars: Bars
 var _measure: Measure  # null unless the page was opened with ?measure
 var _record_button: Button
 var _redo_button: Button
+var _counter_label: Label
 
 
 func _ready() -> void:
@@ -57,6 +58,9 @@ func _ready() -> void:
 		_record_button = _measure_button(-336.0, _record)
 		_redo_button = _measure_button(-176.0, _redo)
 		_redo_button.text = "Заново"
+		_counter_label = _label(56, Control.PRESET_TOP_LEFT)
+		_counter_label.grow_horizontal = Control.GROW_DIRECTION_END
+		_counter_label.position = Vector2(16, 48)
 
 
 func _label(size: int, preset: Control.LayoutPreset) -> Label:
@@ -202,6 +206,7 @@ func _tick_measure() -> void:
 
 func _show_measure() -> void:
 	_status = _measure.text()
+	_counter_label.text = _measure.counter()
 	_record_button.text = "Запись %s" % _measure.chord()
 	_record_button.disabled = _measure.state != Measure.State.WAITING
 	if _measure.state == Measure.State.WAITING:
