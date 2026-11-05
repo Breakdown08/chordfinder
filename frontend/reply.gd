@@ -6,6 +6,7 @@ var confidence: float = 0.0
 var rms: float = 0.0
 var stable: String = ""  # chord several consecutive windows agree on, "" = none yet
 var samples: int = 0
+var probabilities: Dictionary[String, float] = {}  # every chord; empty = the window is silence
 var error: String = ""
 
 
@@ -22,6 +23,11 @@ static func parse(text: String) -> Reply:
 	r.confidence = _number(d.get("confidence"))
 	r.rms = _number(d.get("rms"))
 	r.samples = int(_number(d.get("samples")))
+	var p: Variant = d.get("probabilities")
+	if p is Dictionary:
+		var chords: Dictionary = p
+		for chord: Variant in chords:
+			r.probabilities[str(chord)] = _number(chords[chord])
 	return r
 
 

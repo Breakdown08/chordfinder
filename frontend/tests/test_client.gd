@@ -41,8 +41,17 @@ func _init() -> void:
 	check(Reply.parse('{"error": "frame length 3 is not a multiple of 4"}').error.begins_with("frame"), "reply: error")
 	check(Reply.parse("[1, 2]").error != "", "reply: not an object is an error")
 
+	r = Reply.parse('{"chord": "C", "confidence": 0.7, "rms": 0.02, "probabilities": {"Am": 0.3, "C": 0.7}}')
+	check(r.probabilities.keys() == ["Am", "C"], "reply: probabilities keep the server order")
+	check(is_equal_approx(r.probabilities["C"], 0.7), "reply: probability value")
+	check(Reply.parse('{"probabilities": null}').probabilities.is_empty(), "reply: silence has no probabilities")
+
+	check(Bars.level(0.0) == 0.0, "level: digital silence is the bottom")
+	check(Bars.level(1.0) == 1.0, "level: full scale is the top")
+	check(Bars.level(0.1) > Bars.level(0.01) and Bars.level(0.01) > Bars.level(0.001), "level: louder is higher")
+
 	# Strict typing warnings are errors: a script that breaks them does not compile.
-	for path: String in ["res://listener.gd", "res://frames.gd", "res://reply.gd"]:
+	for path: String in ["res://listener.gd", "res://frames.gd", "res://reply.gd", "res://bars.gd"]:
 		var script: GDScript = load(path)
 		check(script != null and script.can_instantiate(), "compiles: " + path)
 

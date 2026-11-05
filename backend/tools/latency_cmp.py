@@ -21,7 +21,7 @@ from chordfinder import features
 from chordfinder.audio import Audio
 from chordfinder.evaluate import dataset_files, load
 from chordfinder.model import MODELS, ChordModel
-from chordfinder.stream import Stabilizer, Stream, recognize
+from chordfinder.stream import Heard, Stabilizer, Stream, recognize
 
 RATE: int = 48000
 ONSET_LEVEL: float = 0.05
@@ -75,11 +75,8 @@ def trace(model: ChordModel, path: Path, hop_seconds: float) -> Trace:
     start: int
     for start in range(0, len(y), hop):
         stream.push(y[start : start + hop])
-        chord: str | None
-        confidence: float | None
-        _level: float
-        chord, confidence, _level = recognize(model, stream.window, RATE)
-        answers.append(Answer(stream.total / RATE - 1 - onset, chord, confidence))
+        heard: Heard = recognize(model, stream.window, RATE)
+        answers.append(Answer(stream.total / RATE - 1 - onset, heard.chord, heard.confidence))
     return Trace(path.parent.name, answers)
 
 

@@ -23,6 +23,7 @@ var _button: Button
 var _status_label: Label
 var _chord_label: Label
 var _raw_label: Label
+var _bars: Bars
 
 
 func _ready() -> void:
@@ -33,10 +34,20 @@ func _ready() -> void:
 	add_child(_button)
 
 	_status_label = _label(22, Control.PRESET_TOP_LEFT)
+	_status_label.grow_horizontal = Control.GROW_DIRECTION_END
 	_status_label.position = Vector2(16, 16)
-	_chord_label = _label(160, Control.PRESET_CENTER)
+	_chord_label = _label(96, Control.PRESET_CENTER_TOP)
+	_chord_label.position.y += 40
 	_raw_label = _label(22, Control.PRESET_CENTER_BOTTOM)
-	_raw_label.position.y -= 48
+	_raw_label.position.y -= 40
+	_bars = Bars.new()
+	_bars.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_bars.offset_left = 64
+	_bars.offset_right = -64
+	_bars.offset_top = 190
+	_bars.offset_bottom = -64
+	_bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bars)
 
 
 func _label(size: int, preset: Control.LayoutPreset) -> Label:
@@ -125,6 +136,7 @@ func _on_reply(reply: Reply) -> void:
 		_shown_stable = reply.stable
 		print("chord: ", _shown_stable)  # e2e tests read the console
 	_chord_label.text = _shown_stable
+	_bars.show_reply(reply, _shown_stable)
 	_raw_label.text = "тишина · RMS %.3f" % reply.rms if reply.chord == "" else \
 		"сейчас: %s · уверенность %.2f · RMS %.3f" % [reply.chord, reply.confidence, reply.rms]
 

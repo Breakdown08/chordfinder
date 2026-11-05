@@ -92,7 +92,21 @@ def test_ws_silence_is_no_chord(client: TestClient) -> None:
         ws.send_text(json.dumps({"sample_rate": RATE}))
         replies: list[StreamReply] = send(ws, np.zeros(RATE, np.float32))
     assert all(r.chord is None and r.stable is None for r in replies)
-    assert all(r.rms < audio.SILENCE_RMS for r in replies)
+    assert all(r.rms < audio.SILENCE_RMS and r.probabilities is None for r in replies)
+
+
+def test_ws_sends_every_probability(client: TestClient) -> None:
+    ws: WebSocketTestSession
+    with client.websocket_connect("/ws/recognize") as ws:
+        ws.send_text(json.dumps({"sample_rate": RATE}))
+        replies: list[StreamReply] = send(ws, sine(440, 0.5, RATE))
+    last: StreamReply = replies[-1]
+    assert last.probabilities is not None
+    assert list(last.probabilities) == CHORDS
+    assert sum(last.probabilities.values()) == pytest.approx(1, abs=1e-4)
+    assert last.chord is not None
+    assert last.confidence == pytest.approx(max(last.probabilities.values()))
+    assert last.confidence == pytest.approx(last.probabilities[last.chord])
 
 
 @needs_dataset

@@ -1,6 +1,7 @@
 """State of one microphone stream: the last second of audio and a vote over recent answers."""
 
 from collections import deque
+from typing import NamedTuple
 
 import numpy as np
 
@@ -44,12 +45,21 @@ class Stabilizer:
         return first if agreed else None
 
 
-def recognize(model: ChordModel, y: Audio, sample_rate: float) -> tuple[str | None, float | None, float]:
-    """One window -> (chord, confidence, rms); silence is no chord. Blocking: run it off the event loop."""
+class Heard(NamedTuple):
+    """Answer of one window; silence is no chord and no probabilities."""
+
+    chord: str | None
+    confidence: float | None
+    rms: float
+    probabilities: dict[str, float] | None
+
+
+def recognize(model: ChordModel, y: Audio, sample_rate: float) -> Heard:
+    """One window -> what the model heard in it. Blocking: run it off the event loop."""
     level: float = audio.rms(y)
     if level < audio.SILENCE_RMS:
-        return None, None, level
-    chord: str
-    confidence: float
-    chord, confidence = model.predict(audio.resample(y, sample_rate))
-    return chord, confidence, level
+        return Heard(None, None, level, None)
+    p: Audio = model.probabilities(audio.resample(y, sample_rate))
+    i: int = int(np.argmax(p))
+    classes: tuple[str, ...] = model.meta.classes
+    return Heard(classes[i], float(p[i]), level, {c: float(v) for c, v in zip(classes, p, strict=True)})

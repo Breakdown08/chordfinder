@@ -13,7 +13,7 @@ import pytest
 from chordfinder.audio import Audio
 from chordfinder.evaluate import dataset_files, load
 from chordfinder.model import ChordModel
-from chordfinder.stream import HOP_SECONDS, Stabilizer, Stream, recognize
+from chordfinder.stream import HOP_SECONDS, Heard, Stabilizer, Stream, recognize
 from tests.conftest import needs_dataset
 
 RATE: int = 48000
@@ -41,11 +41,8 @@ def replay(model: ChordModel, path: Path) -> Replay:
     start: int
     for start in range(0, len(y), hop):
         stream.push(y[start : start + hop])
-        chord: str | None
-        confidence: float | None
-        _level: float
-        chord, confidence, _level = recognize(model, stream.window, RATE)
-        stable: str | None = stabilizer.push(chord, confidence)
+        heard: Heard = recognize(model, stream.window, RATE)
+        stable: str | None = stabilizer.push(heard.chord, heard.confidence)
         t: float = stream.total / RATE - 1 - onset
         if stable is not None and stable != truth and t > 0:
             false_chord = True

@@ -27,7 +27,7 @@ from starlette.types import Message
 from chordfinder import audio
 from chordfinder.audio import Audio
 from chordfinder.model import ChordModel
-from chordfinder.stream import Stabilizer, Stream, recognize
+from chordfinder.stream import Heard, Stabilizer, Stream, recognize
 
 MAX_CLIP_SECONDS: float = 10.0
 # Single-threaded Godot build: no SharedArrayBuffer, so no COOP/COEP headers are needed.
@@ -54,6 +54,7 @@ class Recognition(BaseModel):
 class StreamReply(Recognition):
     stable: str | None = Field(description="chord several consecutive windows agree on")
     samples: int = Field(description="samples received so far")
+    probabilities: dict[str, float] | None = Field(description="every chord; None when the window is silence")
 
 
 class StreamError(BaseModel):
@@ -132,16 +133,14 @@ async def recognize_stream(ws: WebSocket) -> None:
                 await ws.send_json(StreamError(error=str(e)).model_dump())
                 continue
             stream.push(chunk)
-            chord: str | None
-            confidence: float | None
-            level: float
-            chord, confidence, level = await asyncio.to_thread(recognize, model, stream.window, rate)
+            heard: Heard = await asyncio.to_thread(recognize, model, stream.window, rate)
             reply: StreamReply = StreamReply(
-                chord=chord,
-                confidence=confidence,
-                rms=level,
-                stable=stabilizer.push(chord, confidence),
+                chord=heard.chord,
+                confidence=heard.confidence,
+                rms=heard.rms,
+                stable=stabilizer.push(heard.chord, heard.confidence),
                 samples=stream.total,
+                probabilities=heard.probabilities,
             )
             log_reply(reply)
             await ws.send_json(reply.model_dump())

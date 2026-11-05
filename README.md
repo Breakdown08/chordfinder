@@ -10,7 +10,8 @@ The model comes from my master's thesis (January 2025), where it ran behind a Dj
 around the same weights: ONNX Runtime instead of TensorFlow, a streaming protocol instead of JSON requests, tests and
 CI instead of none.
 
-**Status:** work in progress. The recognition server and the listener client work end to end; the game is next.
+**Status:** work in progress. The recognition server and the client work end to end; the client shows what the model
+hears, window by window (below). Retraining is next, then the game.
 
 ## What it recognises
 
@@ -29,7 +30,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 53 backend, 16 client checks, 3 browser e2e (2 of them in CI against the Docker image; the third needs the dataset) | CI |
+| Tests | 0 | 54 backend, 23 client checks, 3 browser e2e (2 of them in CI against the Docker image; the third needs the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
@@ -44,6 +45,11 @@ would be faster but bring the false chords back; speed has to come from retraini
 microphone ─► Godot web client ─► /ws/recognize ─► resample to 16 kHz ─► 1 s windows ─► CNN (ONNX) ─► vote ─► chord
               Float32, 125 ms      (FastAPI)        (rate from client)     every 125 ms                 3 in a row
 ```
+
+The client draws every window before the vote: one column per chord with its raw probability, a dashed line at the
+vote's confidence threshold, input level on the right with a tick at the silence floor. Amber is the window's best
+guess, green is the chord the vote let through. The start of a strum is where the model is wrong: on one Em test
+recording it says Bb (0.75), then Bdim (0.87), and the vote keeps both off the screen.
 
 - `backend/` — Python 3.12, uv. `src/chordfinder/`: `audio` and `features` (log-mel), `model` (ONNX Runtime),
   `stream` (window buffer and voting), `server` (FastAPI; also serves the web build at `/`), `weights`, `evaluate`,
