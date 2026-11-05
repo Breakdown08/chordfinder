@@ -50,8 +50,33 @@ func _init() -> void:
 	check(Bars.level(1.0) == 1.0, "level: full scale is the top")
 	check(Bars.level(0.1) > Bars.level(0.01) and Bars.level(0.01) > Bars.level(0.001), "level: louder is higher")
 
+	var m: Measure = Measure.new()
+	check(m.chord() == "Am" and m.state == Measure.State.WAITING, "measure: waits for the first chord")
+	m.heard(2, 0.0)
+	check(m.strums == 0, "measure: strums before the button do not count")
+	m.record()
+	m.heard(2, 1.0)
+	check(m.strums == 2 and not m.tail_over(9.0), "measure: two strums are not a take")
+	m.heard(3, 10.0)
+	check(not m.tail_over(11.0), "measure: the last strum rings out on the record")
+	check(m.tail_over(10.0 + Measure.TAIL_SECONDS), "measure: then the take ends")
+	m.advance()
+	check(m.chord() == "Bb" and m.state == Measure.State.WAITING and m.strums == 0, "measure: next chord")
+	m.redo()
+	check(m.chord() == "Am" and m.state == Measure.State.WAITING, "measure: redo between takes goes back")
+	m.record()
+	m.heard(1, 1.0)
+	m.redo()
+	check(m.chord() == "Am" and m.strums == 0 and m.state == Measure.State.WAITING, "measure: redo drops the take")
+	m.index = Measure.CHORDS.size() - 1
+	m.record()
+	m.advance()
+	check(m.state == Measure.State.DONE and m.text().contains("Готово"), "measure: done after the last chord")
+	r = Reply.parse('{"chord": "Am", "take": "Am", "strums": 2}')
+	check(r.take == "Am" and r.strums == 2, "reply: take and strums")
+
 	# Strict typing warnings are errors: a script that breaks them does not compile.
-	for path: String in ["res://listener.gd", "res://frames.gd", "res://reply.gd", "res://bars.gd"]:
+	for path: String in ["res://listener.gd", "res://frames.gd", "res://reply.gd", "res://bars.gd", "res://measure.gd"]:
 		var script: GDScript = load(path)
 		check(script != null and script.can_instantiate(), "compiles: " + path)
 

@@ -24,6 +24,9 @@ var _status_label: Label
 var _chord_label: Label
 var _raw_label: Label
 var _bars: Bars
+var _measure: Measure  # null unless the page was opened with ?measure
+var _record_button: Button
+var _redo_button: Button
 
 
 func _ready() -> void:
@@ -49,6 +52,12 @@ func _ready() -> void:
 	_bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bars)
 
+	if OS.has_feature("web") and "measure" in str(JavaScriptBridge.eval("location.search")):
+		_measure = Measure.new()
+		_record_button = _measure_button(-336.0, _record)
+		_redo_button = _measure_button(-176.0, _redo)
+		_redo_button.text = "Заново"
+
 
 func _label(size: int, preset: Control.LayoutPreset) -> Label:
 	var label: Label = Label.new()
@@ -59,6 +68,19 @@ func _label(size: int, preset: Control.LayoutPreset) -> Label:
 	label.set_anchors_and_offsets_preset(preset)
 	add_child(label)
 	return label
+
+
+func _measure_button(left: float, action: Callable) -> Button:
+	var button: Button = Button.new()
+	button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	button.offset_left = left
+	button.offset_right = left + 150.0
+	button.offset_top = 12
+	button.offset_bottom = 52
+	button.visible = false
+	button.pressed.connect(action)
+	add_child(button)
+	return button
 
 
 func _start() -> void:
@@ -108,6 +130,8 @@ func _process(_delta: float) -> void:
 			if _capture:
 				_status = "Соединение закрыто (%d)" % _ws.get_close_code()
 
+	if _measure:
+		_tick_measure()
 	if _capture and not _heard and Time.get_ticks_msec() / 1000.0 - _started_at > NO_AUDIO_TIMEOUT:
 		_status = _mic_problem()
 	_redraw()
@@ -118,6 +142,10 @@ func _on_open() -> void:
 		_ws.send_text(JSON.stringify({"sample_rate": AudioServer.get_mix_rate()}))
 		_header_sent = true
 		_status = "Играй аккорд"
+		if _measure:
+			_record_button.visible = true
+			_redo_button.visible = true
+			_show_measure()
 	while _ws.get_available_packet_count() > 0:
 		_on_reply(Reply.parse(_ws.get_packet().get_string_from_utf8()))
 	# Fixed-size frames, not "whatever piled up": the server votes over consecutive frames.
@@ -135,10 +163,49 @@ func _on_reply(reply: Reply) -> void:
 	elif reply.stable != "" and reply.stable != _shown_stable:
 		_shown_stable = reply.stable
 		print("chord: ", _shown_stable)  # e2e tests read the console
+	if _measure and reply.take == _measure.chord():
+		_measure.heard(reply.strums, _now())
+		_show_measure()
 	_chord_label.text = _shown_stable
 	_bars.show_reply(reply, _shown_stable)
 	_raw_label.text = "тишина · RMS %.3f" % reply.rms if reply.chord == "" else \
 		"сейчас: %s · уверенность %.2f · RMS %.3f" % [reply.chord, reply.confidence, reply.rms]
+
+
+func _now() -> float:
+	return Time.get_ticks_msec() / 1000.0
+
+
+func _take(chord: Variant) -> void:
+	_ws.send_text(JSON.stringify({"take": chord}))
+
+
+func _record() -> void:
+	_take(_measure.chord())
+	_measure.record()
+	_show_measure()
+
+
+func _redo() -> void:
+	if _measure.state == Measure.State.RECORDING:
+		_take(null)
+	_measure.redo()
+	_show_measure()
+
+
+func _tick_measure() -> void:
+	if _measure.tail_over(_now()):
+		_take(null)
+		_measure.advance()
+		_show_measure()
+
+
+func _show_measure() -> void:
+	_status = _measure.text()
+	_record_button.text = "Запись %s" % _measure.chord()
+	_record_button.disabled = _measure.state != Measure.State.WAITING
+	if _measure.state == Measure.State.WAITING:
+		_record_button.grab_focus()  # hands are on the guitar: Space presses it
 
 
 func _mic_problem() -> String:

@@ -8,3 +8,6 @@ __pycache__/
 backend/models/*.keras
 backend/models/*.onnx
 datasets/
+
+# Raw recordings of measuring sessions: kept locally, scored by tools/takes.py.
+backend/manual/sessions/

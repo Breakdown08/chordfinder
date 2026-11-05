@@ -8,6 +8,7 @@ The client prints "status: ..." and "chord: <stable chord>" to the browser conso
 Chromium is the system one (CHORDFINDER_CHROMIUM or `chromium` on PATH): Playwright downloads nothing.
 """
 
+import json
 import os
 import shutil
 import socket
@@ -15,14 +16,17 @@ import threading
 import time
 from collections.abc import Iterator
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pytest
 import uvicorn
 from scipy.io import wavfile
 
+from chordfinder import server
 from chordfinder.audio import Audio
 from chordfinder.evaluate import load
+from chordfinder.measure import SESSION_FILE
 from chordfinder.server import WEB, app
 from tests.conftest import dataset_file, needs_dataset, needs_model, sine
 from tests.test_server import CHORDS, first_file
@@ -113,6 +117,46 @@ def test_recognition(base: str, tmp_path: Path) -> None:
     hits: int = sum(bool(shown[c]) and shown[c][0] == c for c in CHORDS)
     print(f"\n{hits}/8 {shown}")
     assert hits >= 7
+
+
+@needs_dataset
+@pytest.mark.skipif(URL is not None, reason="the server here must have measuring on")
+def test_measuring_session(base: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """?measure: Space starts a take, three strums end it, the next chord waits; the take is on disk."""
+    from playwright.sync_api import Browser, Page, Playwright, sync_playwright
+
+    monkeypatch.setattr(server, "SESSIONS", tmp_path)
+    rest: Audio = np.zeros(int(RATE * 0.7), np.float32)
+    y: Audio = load(dataset_file(first_file("Am")), RATE)[: RATE * 2]
+    wav: Path = write_wav(tmp_path / "strums.wav", np.concatenate([y, rest] * 4))
+    lines: list[str] = []
+    p: Playwright
+    with sync_playwright() as p:
+        browser: Browser = p.chromium.launch(
+            executable_path=CHROMIUM,
+            args=[
+                "--use-fake-ui-for-media-stream",
+                "--use-fake-device-for-media-stream",
+                f"--use-file-for-fake-audio-capture={wav}",
+                "--use-angle=swiftshader",
+                "--enable-unsafe-swiftshader",
+            ],
+        )
+        page: Page = browser.new_page(viewport={"width": 960, "height": 540})
+        page.on("console", lambda m: lines.append(m.text))
+        page.goto(base + "/?measure")
+        page.wait_for_function("() => !document.querySelector('#status')", timeout=60000)
+        page.wait_for_timeout(500)
+        page.mouse.click(480, 270)
+        page.wait_for_timeout(1500)
+        page.keyboard.press("Space")
+        page.wait_for_timeout(13000)
+        browser.close()
+    print(f"\n{[line for line in lines if line.startswith('status: ')]}")
+    assert "status: 1/8 Am: удар 3 из 3" in lines
+    assert "status: 2/8 Bb: пробел" in lines
+    meta: dict[str, Any] = json.loads(next(tmp_path.glob(f"*/{SESSION_FILE}")).read_text())
+    assert len(meta["takes"]["Am"]) >= 3
 
 
 def test_silence(base: str, tmp_path: Path) -> None:

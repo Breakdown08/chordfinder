@@ -7,6 +7,8 @@ var rms: float = 0.0
 var stable: String = ""  # chord several consecutive windows agree on, "" = none yet
 var samples: int = 0
 var probabilities: Dictionary[String, float] = {}  # every chord; empty = the window is silence
+var take: String = ""  # chord being recorded in a measuring session, "" = none
+var strums: int = 0  # strums counted in that take
 var error: String = ""
 
 
@@ -23,6 +25,8 @@ static func parse(text: String) -> Reply:
 	r.confidence = _number(d.get("confidence"))
 	r.rms = _number(d.get("rms"))
 	r.samples = int(_number(d.get("samples")))
+	r.take = _text(d.get("take"))
+	r.strums = int(_number(d.get("strums")))
 	var p: Variant = d.get("probabilities")
 	if p is Dictionary:
 		var chords: Dictionary = p

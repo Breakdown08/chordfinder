@@ -30,7 +30,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 54 backend, 23 client checks, 3 browser e2e (2 of them in CI against the Docker image; the third needs the dataset) | CI |
+| Tests | 0 | 62 backend, 34 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
@@ -50,6 +50,16 @@ The client draws every window before the vote: one column per chord with its raw
 vote's confidence threshold, input level on the right with a tick at the silence floor. Amber is the window's best
 guess, green is the chord the vote let through. The start of a strum is where the model is wrong: on one Em test
 recording it says Bb (0.75), then Bdim (0.87), and the vote keeps both off the screen.
+
+To measure on a real guitar, open the client in measuring mode: it asks for each chord in turn, counts three strums and
+keeps the raw audio. `tools/takes.py` scores the recordings offline, so the same strums can compare two models. The
+server only records when `CHORDFINDER_SESSIONS` is set.
+
+```bash
+(cd backend && CHORDFINDER_SESSIONS=manual/sessions uv run uvicorn chordfinder.server:app --port 8000)
+# http://localhost:8000/?measure, Space starts each take
+(cd backend && uv run python tools/takes.py manual/sessions/<folder>)
+```
 
 - `backend/` — Python 3.12, uv. `src/chordfinder/`: `audio` and `features` (log-mel), `model` (ONNX Runtime),
   `stream` (window buffer and voting), `server` (FastAPI; also serves the web build at `/`), `weights`, `evaluate`,
