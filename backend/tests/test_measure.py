@@ -43,13 +43,19 @@ def test_quiet_strum_counts() -> None:
     assert len(count(np.concatenate([room(1), strum(peak=0.04)]))) == 1
 
 
+def test_key_press_opening_a_take_is_no_strum() -> None:
+    """The microphone hears Space: a loud first frame then the room, as in the 2026-11-05 takes."""
+    click: Audio = np.full(HOP, 0.013, np.float32)
+    assert count(np.concatenate([click, room(1), strum()])) == [HOP + RATE]
+
+
 def test_room_noise_is_no_strum() -> None:
     assert count(room(5)) == []
     assert count(room(5, 0.008)) == []
 
 
 def test_ring_of_a_strum_is_no_new_strum() -> None:
-    assert len(count(strum(4))) == 1
+    assert len(count(np.concatenate([room(1), strum(4)]))) == 1
 
 
 def test_session_files(tmp_path: Path) -> None:

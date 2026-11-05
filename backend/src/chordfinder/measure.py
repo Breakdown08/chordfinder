@@ -28,7 +28,7 @@ SESSION_FILE: str = "session.json"
 class Onsets:
     def __init__(self, sample_rate: float) -> None:
         self.gap: int = int(sample_rate * MIN_GAP_SECONDS)
-        self.previous: float = 0.0
+        self.previous: float = float("inf")  # the first frame holds the key press, not a strum
         self.last: int | None = None
 
     def push(self, frame: Audio, at: int) -> bool:
