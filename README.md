@@ -3,15 +3,15 @@
 [![CI](https://github.com/Breakdown08/chordfinder/actions/workflows/ci.yml/badge.svg)](https://github.com/Breakdown08/chordfinder/actions/workflows/ci.yml)
 
 Real-time guitar chord recognition in the browser: a CNN on log-mel spectrograms behind a FastAPI WebSocket server,
-and a Godot 4.5 web client that listens to the microphone. The goal is a game where you play real chords on a real
-guitar to cross a bridge; for now the client is a listener: microphone → server → chord on screen.
+and a Godot 4.5 web client that listens to the microphone. The client is an instrument that shows what the model hears,
+and a small game where you play real chords on a real guitar to cross a bridge.
 
 The model comes from my master's thesis (January 2025), where it ran behind a Django app. This repository rebuilds it
 around the same weights: ONNX Runtime instead of TensorFlow, a streaming protocol instead of JSON requests, tests and
 CI instead of none.
 
 **Status:** work in progress. The recognition server and the client work end to end; the client shows what the model
-hears, window by window (below). Retraining is next, then the game.
+hears, window by window (below), and the first demo of the bridge game is playable (below). Retraining is next.
 
 ## What it recognises
 
@@ -70,6 +70,17 @@ server only records when `CHORDFINDER_SESSIONS` is set.
   [`weights-v1`](https://github.com/Breakdown08/chordfinder/releases/tag/weights-v1); `chordfinder weights`
   downloads them and checks SHA-256 against `backend/models/weights.json`.
 
+## The game
+
+Open `http://localhost:8000/?game` (`/` is still the instrument, `/?measure` the measuring mode). A traveller walks
+over a chasm; the next gap shows the chord it needs, and playing that chord on a guitar lays a board. A run is 16 gaps
+in four progressions of four chords, and the walker speeds up from 4.0 s to 2.5 s per span, under a minute in all.
+A chord counts after three consecutive confident replies of the wanted chord;
+a wrong chord costs nothing but time. If the walker reaches a gap with no board, an attempt is lost and
+he goes back to the start of that span, with the boards already laid kept. There are three attempts per run, not per gap.
+The console prints `game:` lines for tuning the thresholds (`ChordJudge`, `BridgeGame` constants). The game runs in the
+browser only.
+
 ## Run
 
 With Docker — the image builds the web client, installs the server and downloads the weights (SHA-256 checked):
@@ -79,7 +90,7 @@ docker build -t chordfinder .
 docker run --rm -p 8000:8000 chordfinder
 ```
 
-Open http://localhost:8000/, allow the microphone, play a chord. The image is 255 MB to download: Python
+Open http://localhost:8000/ (or http://localhost:8000/?game for the game), allow the microphone, play a chord. The image is 255 MB to download: Python
 runtime dependencies only, no TensorFlow, no Godot.
 
 Without Docker: needs [uv](https://docs.astral.sh/uv/) and [Godot 4.5.1](https://godotengine.org/) with web
@@ -97,7 +108,9 @@ Open http://localhost:8000/, allow the microphone, play a chord.
 
 ```sh
 (cd backend && uv run ruff check && uv run mypy && uv run pytest)
+godot --headless --path frontend --import                   # once: builds the class cache the tests need
 godot --headless --path frontend -s tests/test_client.gd   # client: wire format, replies, strict typing
+godot --headless --path frontend -s tests/test_game.gd     # game rules, view, strict typing
 (cd backend && uv run pytest -m e2e -s)                     # Chromium with a fake microphone → web build → server
 (cd backend && CHORDFINDER_URL=http://localhost:8000 uv run pytest -m e2e -s)   # the same against a running container
 ```

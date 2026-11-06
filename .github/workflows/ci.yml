@@ -45,6 +45,7 @@ jobs:
       - run: timeout 300 "$RUNNER_TEMP/godot" --headless --path frontend --import
       # A script that fails to compile leaves Godot running: the timeout turns that into a failure.
       - run: timeout 120 "$RUNNER_TEMP/godot" --headless --path frontend -s tests/test_client.gd
+      - run: timeout 120 "$RUNNER_TEMP/godot" --headless --path frontend -s tests/test_game.gd
 
   # The image a user runs: Godot web export + server + weights. e2e drives Chrome against it.
   docker:

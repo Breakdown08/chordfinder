@@ -6,6 +6,8 @@ extends Control
 const HOP_SECONDS: float = 0.125  # must match backend stream.HOP_SECONDS: the server's vote counts frames
 const NO_AUDIO_TIMEOUT: float = 3.0
 const BUS: String = "Capture"
+const GAME_BARS_HEIGHT: float = 110.0  # the instrument shrinks to a strip at the bottom in the game
+const GAME_RAW_Y: float = 56.0  # the raw reading moves to the top: the middle of the screen belongs to the game
 
 var _ws: WebSocketPeer = WebSocketPeer.new()
 var _capture: AudioEffectCapture
@@ -25,6 +27,7 @@ var _chord_label: Label
 var _raw_label: Label
 var _bars: Bars
 var _measure: Measure  # null unless the page was opened with ?measure
+var _game_view: BridgeView  # null unless the page was opened with ?game
 var _record_button: Button
 var _redo_button: Button
 var _counter_label: Label
@@ -61,6 +64,18 @@ func _ready() -> void:
 		_counter_label = _label(56, Control.PRESET_TOP_LEFT)
 		_counter_label.grow_horizontal = Control.GROW_DIRECTION_END
 		_counter_label.position = Vector2(16, 48)
+	if OS.has_feature("web") and BridgeGame.wanted(str(JavaScriptBridge.eval("location.search"))):
+		_game_view = BridgeView.new()
+		_game_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_game_view.visible = false
+		add_child(_game_view)
+		move_child(_game_view, 0)  # under the labels and the bars
+		_chord_label.visible = false
+		_bars.anchor_top = 1.0
+		_bars.offset_top = -GAME_BARS_HEIGHT
+		_bars.offset_bottom = -4
+		_raw_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+		_raw_label.position.y = GAME_RAW_Y
 
 
 func _label(size: int, preset: Control.LayoutPreset) -> Label:
@@ -89,6 +104,8 @@ func _measure_button(left: float, action: Callable) -> Button:
 
 func _start() -> void:
 	_button.visible = false
+	if _game_view:
+		_game_view.visible = true
 	var bus: int = AudioServer.bus_count
 	AudioServer.add_bus(bus)
 	AudioServer.set_bus_name(bus, BUS)
@@ -117,7 +134,7 @@ func _server_url() -> String:
 	return "ws://127.0.0.1:8000/ws/recognize"
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
 	_ws.poll()
 	if _capture:
 		var n: int = _capture.get_frames_available()
@@ -127,13 +144,19 @@ func _process(_delta: float) -> void:
 				_heard = Frames.has_sound(mono)
 			_pending.append_array(mono)
 
-	match _ws.get_ready_state():
+	var state: WebSocketPeer.State = _ws.get_ready_state()
+	match state:
 		WebSocketPeer.STATE_OPEN:
 			_on_open()
 		WebSocketPeer.STATE_CLOSED:
 			if _capture:
 				_status = "Соединение закрыто (%d)" % _ws.get_close_code()
 
+	if _game_view:
+		var open: bool = state == WebSocketPeer.STATE_OPEN
+		_game_view.set_listening(open and _header_sent and _heard)
+		if open:
+			_game_view.tick(delta)
 	if _measure:
 		_tick_measure()
 	if _capture and not _heard and Time.get_ticks_msec() / 1000.0 - _started_at > NO_AUDIO_TIMEOUT:
@@ -162,6 +185,8 @@ func _on_reply(reply: Reply) -> void:
 	if reply.error != "":
 		_status = "Ошибка сервера: %s" % reply.error
 		return
+	if _game_view:
+		_game_view.on_reply(reply)
 	if reply.chord == "":
 		_shown_stable = ""  # silence ends the chord: the same chord strummed again shows up again
 	elif reply.stable != "" and reply.stable != _shown_stable:
