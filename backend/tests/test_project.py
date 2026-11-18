@@ -14,6 +14,8 @@ RUNTIME: list[str] = [
     "onnxruntime>=1.19",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
+    "prometheus-client>=0.21",
+    "websockets>=13",
 ]
 
 
@@ -69,3 +71,13 @@ def test_ci_has_a_separate_train_job() -> None:
 def test_trained_models_are_not_tracked() -> None:
     ignored: list[str] = (REPO / ".gitignore").read_text().splitlines()
     assert any(line.strip().rstrip("/") in ("backend/models/trained", "models/trained") for line in ignored)
+
+
+def test_lock_has_prometheus_client() -> None:
+    assert 'name = "prometheus-client"' in (BACKEND / "uv.lock").read_text()
+
+
+def test_ci_docker_job_checks_metrics_and_runs_the_load_generator() -> None:
+    job: str = ci_job("docker")
+    assert re.search(r"curl[^\n]*/metrics[^\n]*grep[^\n]*chordfinder_ws_connections", job)
+    assert re.search(r"chordfinder load[^\n]*--steps 1\b", job)

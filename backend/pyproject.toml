@@ -11,6 +11,8 @@ dependencies = [
     "onnxruntime>=1.19",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
+    "prometheus-client>=0.21",
+    "websockets>=13",
 ]
 
 [project.scripts]

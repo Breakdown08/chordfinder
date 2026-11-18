@@ -31,7 +31,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 134 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
+| Tests | 0 | 179 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
@@ -39,6 +39,83 @@ image compiles them at build time.
 
 The extra 0.3 s is the price of smoothing: a chord is shown after three agreeing windows (125 ms step). Two windows
 would be faster but bring the false chords back; speed has to come from retraining, not from tuning.
+
+## Load
+
+How many microphones one server process keeps up with, and what gives out first.
+
+**Ceiling: 48 microphones** on two P-cores (4 logical CPUs) of an Intel Core Ultra 7 155H, synthetic loud audio
+(no window is silence, so every frame runs the whole pipeline). At 56 the delay grows without bound.
+
+| Run | Clients | p95, ms | CPU cores used | features, ms | thread pool wait, ms | Verdict |
+|---|---|---|---|---|---|---|
+| synthetic, 4 CPUs | 1 | 5.7 | 2.15 | 1.41 | 0.1 | pass |
+| | 32 | 15.5 | 3.64 | 3.95 | 0.2 | pass |
+| | 48 | 41.9 | 3.90 | 11.49 | 1.2 | pass |
+| | 56 | 2 822 | 3.97 | 57.54 | 59.5 | fail: p95, lost, backlog |
+| dataset recordings, 4 CPUs | 56 | 94.5 | 3.94 | 21.74 | 2.8 | pass (recordings have silence) |
+| synthetic, no CPU limit | 32 | 749 | 10.52 | 42.70 | 1.7 | fail: p95, backlog |
+| synthetic, 4 CPUs, `OPENBLAS_NUM_THREADS=1` | 1 | 5.9 | 0.03 | 1.38 | 0.2 | pass |
+| | 48 | 18.9 | 1.19 | 5.94 | 0.1 | pass |
+| | 64 | 6 180 | 1.79 | 57.29 | 81.2 | fail: p95, lost, backlog |
+
+What gives out, in two layers:
+
+- OpenBLAS threads in numpy spin while they wait for work. One microphone kept 2.15 cores busy for about
+  0.03 cores of real work, and without a CPU limit the server (one BLAS thread per host CPU) failed already at
+  32 microphones while burning 10.5 cores. With `OPENBLAS_NUM_THREADS=1` the same microphone costs 0.03 cores.
+- Without the spinning, the ceiling is still 48: at 64 microphones the process uses 1.8 of its 4 CPUs while the
+  feature stage (librosa) grows from 1.4 to 57 ms and frames wait 81 ms for a worker thread. Cores sit idle,
+  work is serialised inside one Python process (the GIL). More throughput needs more processes, not faster code.
+
+No step was `invalid`: the generator kept up throughout. It sends frames without WebSocket compression (a browser
+uses deflate), so the server does slightly less work per frame than with real clients.
+
+Reproduce (reports: `backend/manual/load-*.json`):
+
+```sh
+docker build -t chordfinder .
+docker run --rm --cpuset-cpus=1-4 -p 8000:8000 chordfinder    # add -e OPENBLAS_NUM_THREADS=1 for the last rows
+cd backend && taskset -c 6-11 uv run chordfinder load --json manual/load-synthetic.json
+uv run chordfinder load --steps 36,40,44,48,56     # finer steps near the ceiling
+uv run chordfinder load --source dataset --steps 48,56
+```
+
+Real-time criterion for one step (N simulated microphones, each sending a 125 ms frame every 125 ms):
+a frame's delay runs from the moment the microphone "captured" it (its scheduled send time) to the reply.
+A step passes when, over the measured window (after the warm-up), all of this holds:
+
+1. p95 delay <= 125 ms (one hop);
+2. no frame lost: every frame got a reply within the step plus a grace period;
+3. the delay does not grow: median in the last third of the window minus the first third <= 25 ms;
+4. no connection errors and no `{"error": ...}` replies.
+
+A step is `invalid` (neither pass nor fail) when the generator itself could not keep up: p95 of its own
+event-loop lag > 20 ms. The ceiling is the largest N among the consecutive passing steps from the start.
+
+Run the generator against a running server (it sends synthetic loud audio, so no window is silence):
+
+```sh
+cd backend && uv run chordfinder load --json manual/load-synthetic.json
+# --steps 1,2,4 --duration 30 --warmup 3 --source dataset --no-metrics ...; see --help
+```
+
+The server exposes Prometheus metrics (`curl localhost:8000/metrics`):
+
+- `chordfinder_ws_connections`: open `/ws/recognize` connections
+- `chordfinder_frames_total`: binary frames accepted
+- `chordfinder_frame_errors_total`: binary frames rejected
+- `chordfinder_silent_windows_total`: windows taken for silence, where no stage runs
+- `chordfinder_frame_seconds`: frame received to reply sent
+- `chordfinder_threadpool_wait_seconds`: wait for a worker thread
+- `chordfinder_stage_seconds{stage}`: `resample`, `features`, `inference` time per window
+- `chordfinder_stream_lag_seconds`: how far a stream's arrival falls behind its audio
+- `chordfinder_event_loop_lag_seconds`: event-loop wake-up delay
+- `process_cpu_seconds_total` and the other `process_*` series of the client library
+
+`/metrics` has no authentication and exposes no audio or personal data.
+
+Next: one BLAS thread and several uvicorn worker processes (from the numbers above), then Grafana dashboards.
 
 ## How it works
 

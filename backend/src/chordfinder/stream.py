@@ -1,5 +1,7 @@
 """State of one microphone stream: the last second of audio and a vote over recent answers."""
 
+import math
+import time
 from collections import deque
 from typing import NamedTuple
 
@@ -63,3 +65,46 @@ def recognize(model: ChordModel, y: Audio, sample_rate: float) -> Heard:
     i: int = int(np.argmax(p))
     classes: tuple[str, ...] = model.meta.classes
     return Heard(classes[i], float(p[i]), level, {c: float(v) for c, v in zip(classes, p, strict=True)})
+
+
+class Timings(NamedTuple):
+    """Seconds spent in each stage of one non-silent window."""
+
+    resample: float
+    features: float
+    inference: float
+
+
+def recognize_timed(model: ChordModel, y: Audio, sample_rate: float) -> tuple[Heard, Timings | None]:
+    """recognize() with the stages timed; Timings is None for silence, where no stage runs."""
+    level: float = audio.rms(y)
+    if level < audio.SILENCE_RMS:
+        return Heard(None, None, level, None), None
+    t0: float = time.perf_counter()
+    y16: Audio = audio.resample(y, sample_rate)
+    t1: float = time.perf_counter()
+    batch: Audio = model.features(y16)
+    t2: float = time.perf_counter()
+    p: Audio = model.infer(batch)
+    t3: float = time.perf_counter()
+    i: int = int(np.argmax(p))
+    classes: tuple[str, ...] = model.meta.classes
+    heard: Heard = Heard(
+        classes[i], float(p[i]), level, {c: float(v) for c, v in zip(classes, p, strict=True)}
+    )
+    return heard, Timings(t1 - t0, t2 - t1, t3 - t2)
+
+
+class LagMeter:
+    """How far behind its own schedule a stream is: arrival time minus the audio already received."""
+
+    def __init__(self, sample_rate: float) -> None:
+        self.sample_rate: float = sample_rate
+        self.before: int = 0
+        self.best: float = math.inf
+
+    def push(self, received: float, samples: int) -> float:
+        d: float = received - self.before / self.sample_rate
+        self.best = min(self.best, d)
+        self.before += samples
+        return d - self.best

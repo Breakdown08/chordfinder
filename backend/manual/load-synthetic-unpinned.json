@@ -1,0 +1,62 @@
+{
+  "url": "ws://localhost:8001/ws/recognize",
+  "source": "synthetic",
+  "sample_rate": 48000,
+  "hop_seconds": 0.125,
+  "duration": 30.0,
+  "warmup": 3.0,
+  "grace": 2.0,
+  "criterion": {
+    "p95_max_ms": 125.0,
+    "max_lost_fraction": 0.0,
+    "max_backlog_growth_ms": 25.0,
+    "max_client_lag_p95_ms": 20.0
+  },
+  "host": {
+    "cpu": "Intel(R) Core(TM) Ultra 7 155H",
+    "logical_cpus": 22,
+    "python": "3.12.13"
+  },
+  "steps": [
+    {
+      "clients": 32,
+      "measured": 6912,
+      "on_time": 3416,
+      "late": 3496,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 145.47929278342053,
+        "p95": 749.2726877666427,
+        "p99": 916.671508399959,
+        "max": 1073.4872109096614
+      },
+      "late_fraction": 0.5057870370370371,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 384.53869434670196,
+      "client_loop_lag_p95_ms": 1.0307161042874184,
+      "verdict": "fail",
+      "reasons": [
+        "p95",
+        "backlog"
+      ],
+      "server": {
+        "cpu_cores": 10.516888849326946,
+        "frames": 7680,
+        "silent": 0,
+        "frame_ms": 64.2072654631581,
+        "threadpool_wait_ms": 1.7282166720434589,
+        "stream_lag_ms": 140.40415581299612,
+        "loop_lag_ms": 9.452776917792368,
+        "stage_ms": {
+          "resample": 2.1896095198182293,
+          "features": 42.695398465061395,
+          "inference": 0.908846483251106
+        }
+      }
+    }
+  ],
+  "ceiling": 0,
+  "stopped_by": "fail"
+}

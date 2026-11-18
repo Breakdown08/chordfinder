@@ -5,6 +5,7 @@
 WebSocket /ws/recognize: first a text frame {"sample_rate": 48000}, then binary frames of mono
 float32 little-endian samples at that rate (stream.HOP_SECONDS each, 125 ms). Every frame gets a
 StreamReply about the last second of audio. POST /v1/predict answers for one clip.
+GET /metrics: Prometheus text (frame stages, thread pool wait, stream and event loop lag, process CPU).
 CHORDFINDER_LOG=manual.jsonl appends every stream reply with a timestamp (manual check, tools/strums.py).
 CHORDFINDER_SESSIONS=dir turns on measuring: text frames {"take": "Am"} and {"take": null} start and end
 a labelled take, written to a folder under dir (chordfinder.measure). Off by default: a public server
@@ -24,15 +25,16 @@ from typing import Annotated, TextIO
 import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
+from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
 from pydantic import BaseModel, Field
 from starlette.responses import Response
 from starlette.types import Message, Scope
 
-from chordfinder import audio
+from chordfinder import audio, metrics
 from chordfinder.audio import Audio
 from chordfinder.measure import Session
 from chordfinder.model import ChordModel
-from chordfinder.stream import Heard, Stabilizer, Stream, recognize
+from chordfinder.stream import Heard, LagMeter, Stabilizer, Stream, Timings, recognize_timed
 
 MAX_CLIP_SECONDS: float = 10.0
 # Single-threaded Godot build: no SharedArrayBuffer, so no COOP/COEP headers are needed.
@@ -47,7 +49,11 @@ SESSIONS: Path | None = (
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     app.state.model = ChordModel()  # load once at start, not inside the first request
-    yield
+    probe: asyncio.Task[None] = asyncio.create_task(metrics.watch_event_loop())
+    try:
+        yield
+    finally:
+        probe.cancel()
 
 
 app: FastAPI = FastAPI(title="Chord Finder", version="0.2.0", lifespan=lifespan)
@@ -114,6 +120,19 @@ async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/metrics")
+async def prometheus() -> Response:
+    return Response(generate_latest(REGISTRY), media_type=CONTENT_TYPE_LATEST)
+
+
+def timed_recognize(
+    model: ChordModel, y: Audio, rate: float, submitted: float
+) -> tuple[Heard, Timings | None]:
+    """Runs in the pool thread: records how long the call waited for it, then recognizes."""
+    metrics.THREADPOOL_WAIT_SECONDS.observe(time.perf_counter() - submitted)
+    return recognize_timed(model, y, rate)
+
+
 @app.post("/v1/predict")
 async def predict(clip: Clip, model: Annotated[ChordModel, Depends(get_model)]) -> ClipReply:
     if len(clip.samples) > clip.sample_rate * MAX_CLIP_SECONDS:
@@ -143,12 +162,15 @@ async def recognize_stream(ws: WebSocket) -> None:
         await ws.send_json(StreamError(error=str(e)).model_dump())
         await ws.close(code=1003)
         return
+    metrics.WS_CONNECTIONS.inc()
     stream: Stream = Stream(rate)
+    lag: LagMeter = LagMeter(rate)
     stabilizer: Stabilizer = Stabilizer()
     session: Session | None = None
     try:
         while True:
             msg: Message = await ws.receive()
+            received: float = time.perf_counter()
             if msg["type"] == "websocket.disconnect":
                 return
             data: bytes | None = msg.get("bytes")
@@ -175,12 +197,25 @@ async def recognize_stream(ws: WebSocket) -> None:
             try:
                 chunk: Audio = audio.decode_frame(data, rate)
             except audio.ProtocolError as e:
+                metrics.FRAME_ERRORS.inc()
                 await ws.send_json(StreamError(error=str(e)).model_dump())
                 continue
+            metrics.FRAMES.inc()
+            metrics.STREAM_LAG_SECONDS.observe(lag.push(time.monotonic(), len(chunk)))
             stream.push(chunk)
             if session is not None:
                 session.push(chunk)
-            heard: Heard = await asyncio.to_thread(recognize, model, stream.window, rate)
+            heard: Heard
+            timings: Timings | None
+            heard, timings = await asyncio.to_thread(
+                timed_recognize, model, stream.window, rate, time.perf_counter()
+            )
+            if timings is None:
+                metrics.SILENT_WINDOWS.inc()
+            else:
+                metrics.STAGE_SECONDS.labels("resample").observe(timings.resample)
+                metrics.STAGE_SECONDS.labels("features").observe(timings.features)
+                metrics.STAGE_SECONDS.labels("inference").observe(timings.inference)
             reply: StreamReply = StreamReply(
                 chord=heard.chord,
                 confidence=heard.confidence,
@@ -193,8 +228,11 @@ async def recognize_stream(ws: WebSocket) -> None:
             )
             log_reply(reply)
             await ws.send_json(reply.model_dump())
+            metrics.FRAME_SECONDS.observe(time.perf_counter() - received)
     except WebSocketDisconnect:
         return
+    finally:
+        metrics.WS_CONNECTIONS.dec()
 
 
 class WebBuild(StaticFiles):

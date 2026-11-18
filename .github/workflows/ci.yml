@@ -89,6 +89,12 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
         working-directory: backend
+      - name: Metrics are served
+        run: curl -fsS localhost:8000/metrics | grep chordfinder_ws_connections
+      # Exit code 0 whatever the verdict: on a shared runner the verdict means nothing, this only
+      # proves that the generator and the metrics work against the real image.
+      - run: uv run chordfinder load --steps 1 --duration 5 --warmup 1
+        working-directory: backend
       # Without the dataset: silence and a denied microphone; recognition needs recordings.
       - run: uv run pytest -m e2e -s
         working-directory: backend

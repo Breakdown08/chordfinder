@@ -1,16 +1,18 @@
-"""chordfinder weights | export | eval | dataset | train | compare."""
+"""chordfinder weights | export | eval | dataset | train | compare | load."""
 
 import argparse
 import hashlib
 import json
 import sys
 from pathlib import Path
+from typing import Literal
 
 from chordfinder import dataset, evaluate
 from chordfinder import model as model_module
 from chordfinder import weights as weights_module
 from chordfinder.evaluate import Comparison, Report
 from chordfinder.features import Meta
+from chordfinder.load import DEFAULT_STEPS, DEFAULT_URL, LoadConfig
 from chordfinder.model import MODELS, ONNX
 
 TRAINED: Path = MODELS / "trained"
@@ -50,6 +52,29 @@ def main(argv: list[str] | None = None) -> int:
     cp.add_argument("--new", type=Path, default=TRAINED, help="default: models/trained")
     cp.add_argument("--dataset", type=Path, help="dataset directory (default: CHORDFINDER_DATASET)")
     cp.add_argument("--json", type=Path, help="write the report here")
+    ld: argparse.ArgumentParser = sub.add_parser(
+        "load", help="step up simulated microphones against a running server and report the ceiling"
+    )
+    defaults: LoadConfig = LoadConfig()
+    ld.add_argument("--url", default=DEFAULT_URL, help="WebSocket address (default: %(default)s)")
+    ld.add_argument(
+        "--steps",
+        type=steps_arg,
+        default=DEFAULT_STEPS,
+        help="client counts, strictly increasing (default: " + ",".join(map(str, DEFAULT_STEPS)) + ")",
+    )
+    ld.add_argument("--duration", type=float, default=defaults.duration, help="seconds of sending per step")
+    ld.add_argument("--warmup", type=float, default=defaults.warmup, help="first seconds not measured")
+    ld.add_argument("--grace", type=float, default=defaults.grace, help="wait for the last replies")
+    ld.add_argument("--pause", type=float, default=defaults.pause, help="pause between steps")
+    ld.add_argument("--rate", type=int, default=defaults.sample_rate, help="sample rate of the frames, Hz")
+    ld.add_argument("--source", choices=("synthetic", "dataset"), default="synthetic")
+    ld.add_argument("--dataset", type=Path, help="dataset directory (default: CHORDFINDER_DATASET)")
+    ld.add_argument("--seed", type=int, default=defaults.seed)
+    metrics_mode: argparse._MutuallyExclusiveGroup = ld.add_mutually_exclusive_group()
+    metrics_mode.add_argument("--metrics-url", help="default: /metrics of the same host")
+    metrics_mode.add_argument("--no-metrics", action="store_true", help="do not read /metrics")
+    ld.add_argument("--json", type=Path, help="write the report here")
     args: argparse.Namespace = parser.parse_args(argv)
 
     if args.command == "weights":
@@ -67,6 +92,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "train":
         return train_command(args)
 
+    if args.command == "load":
+        return load_command(args)
+
     if args.command == "compare":
         return compare_command(args.old, args.new, args.dataset or evaluate.DATASET, args.json)
 
@@ -82,6 +110,61 @@ def main(argv: list[str] | None = None) -> int:
     if report.accuracy < min_accuracy:
         print(f"below threshold {min_accuracy:.1%}", file=sys.stderr)
         return 1
+    return 0
+
+
+def steps_arg(text: str) -> tuple[int, ...]:
+    try:
+        steps: tuple[int, ...] = tuple(int(part) for part in text.split(","))
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"not a comma-separated list of integers: {text!r}") from None
+    if any(n <= 0 for n in steps) or any(a >= b for a, b in zip(steps, steps[1:], strict=False)):
+        raise argparse.ArgumentTypeError(f"must be positive and strictly increasing: {text!r}")
+    return steps
+
+
+def load_command(args: argparse.Namespace) -> int:
+    import asyncio
+
+    from chordfinder import load
+    from chordfinder.audio import Audio
+
+    source: Literal["synthetic", "dataset"] = args.source
+    signal: Audio
+    if source == "dataset":
+        root: Path = args.dataset or evaluate.DATASET
+        reason: str | None = dataset.check(root, dataset.DatasetManifest.load())
+        if reason is not None:
+            print(f"dataset {root}: {reason}; run chordfinder dataset", file=sys.stderr)
+            return 1
+        signal = load.dataset_signal(root, args.rate)
+    else:
+        signal = load.synthetic_signal(args.rate, 10.0, args.seed)
+    why: str | None = asyncio.run(load.preflight(args.url, args.rate, signal))
+    if why is not None:
+        print(f"load: server not reachable at {args.url}: {why}", file=sys.stderr)
+        return 1
+    metrics: str | None = None if args.no_metrics else args.metrics_url or load.metrics_url(args.url)
+    if metrics is not None and asyncio.run(load.scrape(metrics)) is None:
+        print(f"load: {metrics} is not available, continuing without server metrics", file=sys.stderr)
+        metrics = None
+    config: LoadConfig = LoadConfig(
+        url=args.url,
+        metrics=metrics,
+        sample_rate=args.rate,
+        duration=args.duration,
+        warmup=args.warmup,
+        grace=args.grace,
+        pause=args.pause,
+        seed=args.seed,
+    )
+    print(load.HEADER, flush=True)
+    report: load.LoadReport = asyncio.run(
+        load.run(config, args.steps, signal, source, lambda r: print(load.format_step(r), flush=True))
+    )
+    print(load.format_ceiling(report))
+    if args.json is not None:
+        args.json.write_text(report.model_dump_json(indent=2) + "\n")
     return 0
 
 
