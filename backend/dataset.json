@@ -1,0 +1,11 @@
+{
+  "name": "guitar-chords-v3",
+  "source": "https://www.kaggle.com/datasets/fabianavinci/guitar-chords-v3",
+  "author": "Fabiana Vinci",
+  "licence": "CC BY-SA 4.0",
+  "files": 1760,
+  "content_sha256": "56f2b2f0c27a7c3f0f754393e14086bdc5c538d573fd15b183d284cb243cfd2a",
+  "test_files": 320,
+  "test_content_sha256": "514d8113181a6ffb2620ea5ce45557099911d291f47e825e230ab1460c289400",
+  "archive": null
+}

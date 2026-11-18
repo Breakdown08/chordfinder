@@ -125,8 +125,8 @@ class Release(BaseModel):
     assets: list[Asset]
 
 
-def github_fetch(manifest: Manifest, token: str | None = None) -> Fetch:
-    """Release assets by name through the API (a private repository needs GITHUB_TOKEN)."""
+def github_release_fetch(repo: str, tag: str, token: str | None = None) -> Fetch:
+    """Assets of release `tag` in `repo` by name through the API (a private repository needs GITHUB_TOKEN)."""
     token = token or os.environ.get("GITHUB_TOKEN")
     assets: dict[str, str] = {}  # name -> API url, filled on the first fetch
 
@@ -143,18 +143,23 @@ def github_fetch(manifest: Manifest, token: str | None = None) -> Fetch:
 
     def fetch(name: str) -> bytes:
         if not assets:
-            url: str = f"{API}/repos/{manifest.repo}/releases/tags/{manifest.tag}"
+            url: str = f"{API}/repos/{repo}/releases/tags/{tag}"
             try:
                 body: bytes = get(url, "application/vnd.github+json")
             except urllib.error.HTTPError as e:
                 if e.code != 404:
                     raise
                 hint: str = "" if token else "; a private repository needs GITHUB_TOKEN"
-                raise WeightsError(f"no release {manifest.tag} in {manifest.repo}{hint}") from e
+                raise WeightsError(f"no release {tag} in {repo}{hint}") from e
             release: Release = Release.model_validate_json(body)
             assets.update({a.name: a.url for a in release.assets})
         if name not in assets:
-            raise WeightsError(f"release {manifest.tag} of {manifest.repo} has no asset {name}")
+            raise WeightsError(f"release {tag} of {repo} has no asset {name}")
         return get(assets[name], "application/octet-stream")
 
     return fetch
+
+
+def github_fetch(manifest: Manifest, token: str | None = None) -> Fetch:
+    """Release assets of the weights manifest by name."""
+    return github_release_fetch(manifest.repo, manifest.tag, token)

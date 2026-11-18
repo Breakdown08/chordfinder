@@ -22,13 +22,28 @@ jobs:
       - run: uv sync --locked
       - run: uv run ruff check
       - run: uv run ruff format --check
+      - run: uv run ty check
       - run: uv run mypy
       - name: Model weights (GitHub Release, pinned by SHA-256 in models/weights.json)
         run: uv run chordfinder weights
         env:
           GITHUB_TOKEN: ${{ github.token }}
-      # Tests that need the dataset (Kaggle, licence unknown) skip here: accuracy, parity, latency.
+      # Tests that need the dataset (Kaggle, CC BY-SA 4.0) skip here: accuracy, parity, latency.
       - run: uv run pytest
+
+  # The Keras training code: TensorFlow is not in the backend job, so its tests run here on synthetic data.
+  train:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked --group train
+      - run: uv run --group train pytest tests/test_train.py
 
   frontend:
     runs-on: ubuntu-24.04

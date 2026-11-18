@@ -29,9 +29,10 @@ class ChordModel:
         mel: Audio = features.log_mel(features.window(audio_16k, self.meta), self.meta)
         # Keras added the channel axis implicitly; the ONNX graph wants it spelled out: (1, mels, frames, 1)
         batch: Audio = mel[np.newaxis, ..., np.newaxis]
-        out: npt.NDArray[np.float32] = np.asarray(
-            self.session.run(None, {self.input: batch})[0][0], np.float32
+        probabilities: npt.NDArray[np.float32] = np.asarray(
+            self.session.run(None, {self.input: batch})[0], np.float32
         )
+        out: npt.NDArray[np.float32] = probabilities[0]
         return out
 
     def predict(self, audio_16k: Audio) -> tuple[str, float]:

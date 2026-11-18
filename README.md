@@ -11,13 +11,14 @@ around the same weights: ONNX Runtime instead of TensorFlow, a streaming protoco
 CI instead of none.
 
 **Status:** work in progress. The recognition server and the client work end to end; the client shows what the model
-hears, window by window (below), and the first demo of the bridge game is playable (below). Retraining is next.
+hears, window by window (below), and the first demo of the bridge game is playable (below). Retraining from scratch is possible (see Train); the runtime still serves the thesis weights.
 
 ## What it recognises
 
 Eight chords: Am, Bb, Bdim, C, Dm, Em, F, G. Model input is one second of audio at 16 kHz, 64 mel bands
 (`backend/models/meta.json`). Trained on the Kaggle dataset
-[guitar-chords-v3](https://www.kaggle.com/datasets/fabianavinci/guitar-chords-v3) (20 instruments plus synthetic).
+[guitar-chords-v3](https://www.kaggle.com/datasets/fabianavinci/guitar-chords-v3) (20 instruments plus synthetic) by Fabiana Vinci, licensed
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
 
 ## Measured
 
@@ -104,6 +105,44 @@ export templates.
 
 Open http://localhost:8000/, allow the microphone, play a chord.
 
+## Train
+
+The model can be trained again from the dataset; the runtime (`backend/models/`) is not touched, the result goes
+to `backend/models/trained/` (not in git).
+
+```sh
+cd backend
+uv run chordfinder dataset                         # download and verify the dataset (see below), or:
+uv run chordfinder dataset --archive archive.zip   #   unpack a zip downloaded from Kaggle by hand
+uv run chordfinder dataset --check                 # verify an existing directory against dataset.json
+uv run --group train chordfinder train             # Keras, CPU; writes chord-cnn.keras, chord-cnn.onnx, meta.json, history.json
+uv run chordfinder weights --all
+uv run chordfinder compare --json models/trained/compare.json   # thesis model vs the new one on the same 320 test files
+```
+
+`compare` prints accuracy, accuracy per class, both confusion matrices and a paired comparison (files only one of
+the models gets right, exact McNemar p-value). The ONNX file has the same graph contract as `models/chord-cnn.onnx`,
+so `ChordModel("models/trained")` and `tools/takes.py --models models/trained` load it unchanged.
+
+The dataset is pinned by a hash of its content, not of its zip (Kaggle may rebuild the zip and unpackers spell some
+file names differently). A mirror in a GitHub Release is used by `chordfinder dataset` once one is pinned in
+`dataset.json`; until then download `archive.zip` from the Kaggle page and use `--archive`.
+
+What is kept from the thesis recipe: features, the model (`model_Conv2D`), windows (envelope mask at 0.01, whole
+one-second windows, the tail dropped), Adam 1e-3, categorical cross-entropy (in its sparse form), batch 32, 30 epochs,
+shuffling, the last epoch is the result (no model selection).
+
+What differs: a seed (`--seed`, default 0) with deterministic TensorFlow ops, so a rerun on the same machine is meant to
+give the same weights; and 15 % of the guitars in `Training` are held out for validation (`--val 0.15`; `--val 0` trains
+on everything, as the thesis did). A guitar is one group of recordings across all chord folders, the validation split
+never cuts a group. `Test` is never read by `train`.
+
+What the test measures: the split has no guitar on both sides (45 guitars in `Training`, 10 in `Test`), so accuracy
+is "new guitar, not new player": one performer (JO) appears on both sides with different instruments, and the virtual
+AcusticPlug guitars of `Test` come from the same plugin as those of `Training`.
+
+Training time, accuracy of the new model and the comparison with the thesis weights are not measured yet.
+
 ## Test
 
 ```sh
@@ -117,6 +156,9 @@ godot --headless --path frontend -s tests/test_game.gd     # game rules, view, s
 
 CI builds the image, starts it and runs the browser tests against it.
 
-Accuracy, parity and latency tests need the dataset and skip without it. Its licence is unknown, so it is not
-included: download it from Kaggle and point `CHORDFINDER_DATASET` at its `data/` directory
-(default `~/datasets/guitar-chords-v3/data`).
+Accuracy, parity and latency tests need the dataset and skip without it. It is not included in the repository:
+`chordfinder dataset` fetches and verifies it (see Train), or point `CHORDFINDER_DATASET` at its `data/` directory
+(default `~/datasets/guitar-chords-v3/data`). `backend/dataset.json` pins it by a content hash.
+
+The tests of the training code that need TensorFlow run in the CI job `train`, or locally with
+`(cd backend && uv run --group train pytest tests/test_train.py)`.

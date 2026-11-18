@@ -16,7 +16,7 @@ import asyncio
 import json
 import os
 import time
-from collections.abc import AsyncIterator
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Annotated, TextIO
@@ -45,7 +45,7 @@ SESSIONS: Path | None = (
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     app.state.model = ChordModel()  # load once at start, not inside the first request
     yield
 

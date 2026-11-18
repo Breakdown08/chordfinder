@@ -22,6 +22,7 @@ dev = [
     "ruff>=0.7",
     "mypy>=1.13",
     "httpx>=0.27",
+    "ty>=0.0.1",
 ]
 e2e = [
     "playwright>=1.48",
@@ -33,6 +34,8 @@ export = [
     "tf2onnx>=1.16",
     "onnx>=1.16,<1.18",  # 1.18+ needs ml_dtypes newer than TensorFlow 2.16 allows
 ]
+# Keras training (`chordfinder train`); never needed at runtime. Same packages as export.
+train = [{ include-group = "export" }]
 
 [tool.uv]
 # e2e is default so that `uv sync` gives mypy the Playwright types everywhere; browsers are not downloaded.
@@ -65,3 +68,7 @@ files = ["src", "tests", "tools"]
 [[tool.mypy.overrides]]
 module = ["librosa.*", "scipy.*", "onnxruntime.*", "tf2onnx.*", "keras.*", "tensorflow.*"]
 ignore_missing_imports = true
+
+# TensorFlow is only in the export/train groups, so CI's plain `uv sync` has no keras, tensorflow, tf2onnx.
+[tool.ty.analysis]
+allowed-unresolved-imports = ["keras", "keras.**", "tensorflow", "tensorflow.**", "tf2onnx", "tf2onnx.**"]

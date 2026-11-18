@@ -1,6 +1,7 @@
 """Wire format and resampling: the server must hear the pitch the client recorded."""
 
 import numpy as np
+import numpy.typing
 import pytest
 
 from chordfinder import audio
