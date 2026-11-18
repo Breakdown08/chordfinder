@@ -1,5 +1,6 @@
 """Project wiring of the training task: dependency groups, CI steps, ignored output. Reads files only."""
 
+import json
 import re
 import tomllib
 from pathlib import Path
@@ -79,5 +80,51 @@ def test_lock_has_prometheus_client() -> None:
 
 def test_ci_docker_job_checks_metrics_and_runs_the_load_generator() -> None:
     job: str = ci_job("docker")
+    assert re.search(r"curl[^\n]*/metrics[^\n]*grep[^\n]*chordfinder_ws_connections", job)
+    assert re.search(r"chordfinder load[^\n]*--steps 1\b", job)
+
+
+# --- workers task (checks 27-29) --------------------------------------------------------------
+
+
+def test_serve_script_and_threadpoolctl_are_declared() -> None:
+    p: dict[str, Any] = pyproject()
+    assert p["project"]["scripts"]["chordfinder-serve"] == "chordfinder.serve:main"
+    assert any(d.startswith("threadpoolctl") for d in p["dependency-groups"]["dev"])
+    assert 'name = "threadpoolctl"' in (BACKEND / "uv.lock").read_text()
+
+
+def final_stage() -> list[str]:
+    lines: list[str] = (REPO / "Dockerfile").read_text().splitlines()
+    last: int = max(i for i, line in enumerate(lines) if line.startswith("FROM "))
+    return lines[last + 1 :]
+
+
+def test_dockerfile_sets_one_thread_before_the_warm_up_and_starts_the_launcher() -> None:
+    from chordfinder import serve
+
+    stage: list[str] = final_stage()
+    envs: list[int] = [
+        i
+        for i, line in enumerate(stage)
+        if line.startswith("ENV ") and all(f"{k}={v}" in line for k, v in serve.NATIVE_THREADS.items())
+    ]
+    warm: list[int] = [i for i, line in enumerate(stage) if line.startswith("RUN python -c")]
+    assert envs, "no ENV line with every pair of NATIVE_THREADS"
+    assert warm, "no warm-up line"
+    assert envs[0] < warm[0]
+    cmd: list[str] = [line for line in stage if line.startswith("CMD ")]
+    assert len(cmd) == 1
+    argv: list[str] = json.loads(cmd[0][len("CMD ") :])
+    assert argv[0] == "chordfinder-serve"
+    assert ["--host", "0.0.0.0"] == argv[argv.index("--host") : argv.index("--host") + 2]
+    assert ["--port", "8000"] == argv[argv.index("--port") : argv.index("--port") + 2]
+    assert "--workers" not in argv
+
+
+def test_ci_docker_job_checks_pools_and_own_cpu_counter() -> None:
+    job: str = ci_job("docker")
+    assert "threadpool_info" in job
+    assert re.search(r"curl[^\n]*/metrics[^\n]*grep[^\n]*chordfinder_cpu_seconds_total", job)
     assert re.search(r"curl[^\n]*/metrics[^\n]*grep[^\n]*chordfinder_ws_connections", job)
     assert re.search(r"chordfinder load[^\n]*--steps 1\b", job)

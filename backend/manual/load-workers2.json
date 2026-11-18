@@ -1,0 +1,202 @@
+{
+  "url": "ws://localhost:8001/ws/recognize",
+  "source": "synthetic",
+  "sample_rate": 48000,
+  "hop_seconds": 0.125,
+  "duration": 30.0,
+  "warmup": 3.0,
+  "grace": 2.0,
+  "criterion": {
+    "p95_max_ms": 125.0,
+    "max_lost_fraction": 0.0,
+    "max_backlog_growth_ms": 25.0,
+    "max_client_lag_p95_ms": 20.0
+  },
+  "host": {
+    "cpu": "Intel(R) Core(TM) Ultra 7 155H",
+    "logical_cpus": 22,
+    "python": "3.12.13"
+  },
+  "steps": [
+    {
+      "clients": 1,
+      "measured": 216,
+      "on_time": 216,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 4.783044583746232,
+        "p95": 5.91567508308799,
+        "p99": 6.409377586169284,
+        "max": 6.857578082417604
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.06742500045220368,
+      "client_loop_lag_p95_ms": 1.4829153500613725,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 0.029642471306943675,
+        "frames": 240,
+        "silent": 0,
+        "frame_ms": 2.8608210711051165,
+        "threadpool_wait_ms": 0.13920817500547855,
+        "stream_lag_ms": 1.0075542040794971,
+        "loop_lag_ms": 0.5673728100446728,
+        "stage_ms": {
+          "resample": 0.4067425083121634,
+          "features": 1.3585547000730003,
+          "inference": 0.33550442076375475
+        }
+      }
+    },
+    {
+      "clients": 16,
+      "measured": 3456,
+      "on_time": 3456,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 3.1946324015734717,
+        "p95": 5.175645324925426,
+        "p99": 6.356395485636308,
+        "max": 7.588189670059364
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.0278409497695975,
+      "client_loop_lag_p95_ms": 1.4463915482338023,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 0.31480286989596507,
+        "frames": 3840,
+        "silent": 0,
+        "frame_ms": 5.728509751850197,
+        "threadpool_wait_ms": 0.07810708912453872,
+        "stream_lag_ms": 10.492308512675663,
+        "loop_lag_ms": 0.41221605669898537,
+        "stage_ms": {
+          "resample": 2.8521195939693675,
+          "features": 2.131838416876993,
+          "inference": 0.2422379162207259
+        }
+      }
+    },
+    {
+      "clients": 32,
+      "measured": 6912,
+      "on_time": 6912,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 2.9406594730971847,
+        "p95": 4.165104367348248,
+        "p99": 5.092521657788894,
+        "max": 7.784367895510513
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.014575736713595688,
+      "client_loop_lag_p95_ms": 1.0394365992397043,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 0.5492375550551916,
+        "frames": 7680,
+        "silent": 0,
+        "frame_ms": 2.1936696532681785,
+        "threadpool_wait_ms": 0.04833126842716713,
+        "stream_lag_ms": 0.522493507960083,
+        "loop_lag_ms": 0.2936274307429903,
+        "stage_ms": {
+          "resample": 0.2374210452008659,
+          "features": 1.353485478366186,
+          "inference": 0.23076276367438217
+        }
+      }
+    },
+    {
+      "clients": 48,
+      "measured": 10368,
+      "on_time": 10368,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 3.156364506139653,
+        "p95": 5.382366999765509,
+        "p99": 6.33388584057684,
+        "max": 8.325838425662369
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.03643575109890662,
+      "client_loop_lag_p95_ms": 1.0211529493972167,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 0.900164590501973,
+        "frames": 11520,
+        "silent": 0,
+        "frame_ms": 2.628523126851532,
+        "threadpool_wait_ms": 0.05049842228951699,
+        "stream_lag_ms": 0.49279353757722477,
+        "loop_lag_ms": 0.2502484515377379,
+        "stage_ms": {
+          "resample": 0.2597230014285085,
+          "features": 1.728569180546755,
+          "inference": 0.25016866976872937
+        }
+      }
+    },
+    {
+      "clients": 64,
+      "measured": 13824,
+      "on_time": 10540,
+      "late": 3284,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 6.699685734929517,
+        "p95": 355.45590350920946,
+        "p99": 460.12220348166056,
+        "max": 564.3836440431187
+      },
+      "late_fraction": 0.23755787037037038,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 188.16744180367095,
+      "client_loop_lag_p95_ms": 1.019285304937509,
+      "verdict": "fail",
+      "reasons": [
+        "p95",
+        "backlog"
+      ],
+      "server": {
+        "cpu_cores": 1.705676651506173,
+        "frames": 15360,
+        "silent": 0,
+        "frame_ms": 35.88716100234279,
+        "threadpool_wait_ms": 8.871881993936864,
+        "stream_lag_ms": 30.465958168629946,
+        "loop_lag_ms": 1.5592073712067396,
+        "stage_ms": {
+          "resample": 1.023080154613846,
+          "features": 21.616494802927377,
+          "inference": 0.481356060842586
+        }
+      }
+    }
+  ],
+  "ceiling": 48,
+  "stopped_by": "fail"
+}

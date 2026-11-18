@@ -91,6 +91,13 @@ jobs:
         working-directory: backend
       - name: Metrics are served
         run: curl -fsS localhost:8000/metrics | grep chordfinder_ws_connections
+      - name: One thread in every native pool of the image
+        run: >-
+          docker exec cf python -c "import numpy, scipy.linalg, librosa, onnxruntime;
+          from threadpoolctl import threadpool_info; i = threadpool_info();
+          assert i and all(p['num_threads'] == 1 for p in i), i"
+      - name: The CPU counter is served
+        run: curl -fsS localhost:8000/metrics | grep '^chordfinder_cpu_seconds_total'
       # Exit code 0 whatever the verdict: on a shared runner the verdict means nothing, this only
       # proves that the generator and the metrics work against the real image.
       - run: uv run chordfinder load --steps 1 --duration 5 --warmup 1

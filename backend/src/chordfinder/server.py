@@ -1,11 +1,16 @@
 """HTTP and WebSocket API of the recognizer.
 
-    uv run uvicorn chordfinder.server:app --port 8000
+    uv run uvicorn chordfinder.server:app --port 8000        # one process
+    uv run chordfinder-serve --workers 4                      # several (the Docker image's default)
+
+chordfinder-serve starts one uvicorn worker per available CPU (at most 8; CHORDFINDER_WORKERS or
+--workers sets the number) with one BLAS thread each. With several processes /metrics sums the series
+over the processes and does not serve process_* (chordfinder_cpu_seconds_total replaces it).
 
 WebSocket /ws/recognize: first a text frame {"sample_rate": 48000}, then binary frames of mono
 float32 little-endian samples at that rate (stream.HOP_SECONDS each, 125 ms). Every frame gets a
 StreamReply about the last second of audio. POST /v1/predict answers for one clip.
-GET /metrics: Prometheus text (frame stages, thread pool wait, stream and event loop lag, process CPU).
+GET /metrics: Prometheus text (frame stages, thread pool wait, stream and event loop lag, CPU).
 CHORDFINDER_LOG=manual.jsonl appends every stream reply with a timestamp (manual check, tools/strums.py).
 CHORDFINDER_SESSIONS=dir turns on measuring: text frames {"take": "Am"} and {"take": null} start and end
 a labelled take, written to a folder under dir (chordfinder.measure). Off by default: a public server
@@ -25,7 +30,7 @@ from typing import Annotated, TextIO
 import numpy as np
 from fastapi import Depends, FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
+from prometheus_client import CONTENT_TYPE_LATEST
 from pydantic import BaseModel, Field
 from starlette.responses import Response
 from starlette.types import Message, Scope
@@ -48,12 +53,16 @@ SESSIONS: Path | None = (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
+    if metrics.MULTIPROCESS:
+        metrics.forget_dead_processes()  # live gauges of a worker uvicorn restarted after it died
+    metrics.record_cpu()
     app.state.model = ChordModel()  # load once at start, not inside the first request
     probe: asyncio.Task[None] = asyncio.create_task(metrics.watch_event_loop())
     try:
         yield
     finally:
         probe.cancel()
+        metrics.process_exit()
 
 
 app: FastAPI = FastAPI(title="Chord Finder", version="0.2.0", lifespan=lifespan)
@@ -122,7 +131,7 @@ async def healthz() -> dict[str, str]:
 
 @app.get("/metrics")
 async def prometheus() -> Response:
-    return Response(generate_latest(REGISTRY), media_type=CONTENT_TYPE_LATEST)
+    return Response(metrics.exposition(), media_type=CONTENT_TYPE_LATEST)
 
 
 def timed_recognize(
@@ -163,6 +172,7 @@ async def recognize_stream(ws: WebSocket) -> None:
         await ws.close(code=1003)
         return
     metrics.WS_CONNECTIONS.inc()
+    metrics.WORKER_WS_CONNECTIONS.inc()
     stream: Stream = Stream(rate)
     lag: LagMeter = LagMeter(rate)
     stabilizer: Stabilizer = Stabilizer()
@@ -233,6 +243,7 @@ async def recognize_stream(ws: WebSocket) -> None:
         return
     finally:
         metrics.WS_CONNECTIONS.dec()
+        metrics.WORKER_WS_CONNECTIONS.dec()
 
 
 class WebBuild(StaticFiles):

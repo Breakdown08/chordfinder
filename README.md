@@ -31,7 +31,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 179 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
+| Tests | 0 | 238 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
@@ -42,9 +42,9 @@ would be faster but bring the false chords back; speed has to come from retraini
 
 ## Load
 
-How many microphones one server process keeps up with, and what gives out first.
+How many microphones the server keeps up with (one process, and several), and what gives out first.
 
-**Ceiling: 48 microphones** on two P-cores (4 logical CPUs) of an Intel Core Ultra 7 155H, synthetic loud audio
+**Ceiling before the worker processes: 48 microphones**, one process, on two P-cores (4 logical CPUs) of an Intel Core Ultra 7 155H, synthetic loud audio
 (no window is silence, so every frame runs the whole pipeline). At 56 the delay grows without bound.
 
 | Run | Clients | p95, ms | CPU cores used | features, ms | thread pool wait, ms | Verdict |
@@ -59,7 +59,37 @@ How many microphones one server process keeps up with, and what gives out first.
 | | 48 | 18.9 | 1.19 | 5.94 | 0.1 | pass |
 | | 64 | 6 180 | 1.79 | 57.29 | 81.2 | fail: p95, lost, backlog |
 
-What gives out, in two layers:
+After this the image runs one uvicorn process per available CPU (4 on 4 CPUs, at most 8 by default) with one BLAS
+thread each. Same machine, same 4 CPUs, same criterion:
+
+| Run | Clients | p95, ms | CPU cores used | features, ms | thread pool wait, ms | Verdict |
+|---|---|---|---|---|---|---|
+| synthetic, 4 processes (default) | 1 | 6.6 | 0.04 | 1.40 | 0.2 | pass |
+| | 64 | 5.3 | 1.26 | 1.61 | 0.1 | pass |
+| | 88 | 7.2 | 1.89 | 2.17 | 0.1 | pass |
+| | 88, repeated | 17.2 | 2.02 | 3.55 | 0.1 | pass |
+| | 96 | 7 913 | 2.29 | 38.02 | 13.6 | fail: p95, lost |
+| dataset recordings, 4 processes | 88 | 2 473 | 2.32 | 42.44 | 5.3 | fail: p95 |
+| synthetic, 2 processes | 48 | 5.4 | 0.90 | 1.73 | 0.1 | pass |
+| | 64 | 355 | 1.71 | 21.62 | 8.9 | fail: p95, backlog |
+| | 64, repeated | 12.6 | 1.36 | 2.88 | 0.1 | pass |
+| synthetic, 8 processes | 72 | 5.2 | 1.50 | 1.65 | 0.1 | pass |
+| | 80 | 2 254 | 2.05 | 25.45 | 6.8 | fail: p95 |
+
+**Ceiling with 4 processes: 64 to 88 microphones** (was 48), and the spread is the finding. The same 88 passes
+twice on synthetic audio and fails on the dataset recordings, which are cheaper. What decides is how the connections
+fall on the processes: uvicorn's workers share one listening socket, and whichever process wakes first takes the
+connection. At 88 they fell 13 / 31 / 29 / 15, at 96 37 / 26 / 18 / 15, with 8 processes at 48 microphones
+3 / 1 / 6 / 1 / 26 / 1 / 8 / 2 (`chordfinder_worker_ws_connections`). The busiest process gives out at roughly 30 to
+37 connections while the container as a whole uses 2.0 to 2.3 of its 4 CPUs. So the limit now is the balance, not
+the CPU, and more processes do not help: 8 processes reach 72, 2 processes 48 to 64.
+
+- One microphone costs 0.04 cores: the BLAS spinning is gone from the image.
+- Memory: 806 MB for 4 processes, 1.23 GB for 8 (`docker stats`), about 200 MB per process.
+- `CPU cores used` (`chordfinder_cpu_seconds_total`) agrees with `docker stats`: 2.02 against 203 %, 2.29 against
+  249 % (within 10 %), so the master process is negligible.
+
+What gave out in the one-process runs, in two layers:
 
 - OpenBLAS threads in numpy spin while they wait for work. One microphone kept 2.15 cores busy for about
   0.03 cores of real work, and without a CPU limit the server (one BLAS thread per host CPU) failed already at
@@ -75,10 +105,12 @@ Reproduce (reports: `backend/manual/load-*.json`):
 
 ```sh
 docker build -t chordfinder .
-docker run --rm --cpuset-cpus=1-4 -p 8000:8000 chordfinder    # add -e OPENBLAS_NUM_THREADS=1 for the last rows
-cd backend && taskset -c 6-11 uv run chordfinder load --json manual/load-synthetic.json
-uv run chordfinder load --steps 36,40,44,48,56     # finer steps near the ceiling
-uv run chordfinder load --source dataset --steps 48,56
+docker run --rm --cpuset-cpus=1-4 -p 8000:8000 chordfinder    # 4 processes; -e CHORDFINDER_WORKERS=2 or 8 for the other rows
+cd backend && taskset -c 6-11 uv run chordfinder load --steps 1,2,4,8,16,32,48,64,96,128,160,192 --json manual/load-workers.json
+uv run chordfinder load --steps 72,80,88,96         # finer steps near the ceiling
+uv run chordfinder load --source dataset --steps 88,96
+curl -s localhost:8000/metrics | grep chordfinder_worker_ws_connections   # connections per process, during a step
+# The one-process "before" rows: the image before this change (commit 11e378b), load-synthetic*.json
 ```
 
 Real-time criterion for one step (N simulated microphones, each sending a 125 ms frame every 125 ms):
@@ -111,11 +143,17 @@ The server exposes Prometheus metrics (`curl localhost:8000/metrics`):
 - `chordfinder_stage_seconds{stage}`: `resample`, `features`, `inference` time per window
 - `chordfinder_stream_lag_seconds`: how far a stream's arrival falls behind its audio
 - `chordfinder_event_loop_lag_seconds`: event-loop wake-up delay
-- `process_cpu_seconds_total` and the other `process_*` series of the client library
+- `chordfinder_cpu_seconds_total`: CPU time (user + system) of the server processes
+- `chordfinder_worker_ws_connections{pid}`: open connections per process (without `pid` with one process)
+- `process_cpu_seconds_total` and the other `process_*` series of the client library, with one process only
+
+With several processes the series are summed over the processes (the event-loop lag is one histogram of all of
+them) and `process_*` is not served; `chordfinder_cpu_seconds_total` replaces it.
 
 `/metrics` has no authentication and exposes no audio or personal data.
 
-Next: one BLAS thread and several uvicorn worker processes (from the numbers above), then Grafana dashboards.
+Next: even out the connections (a listening socket per process with `SO_REUSEPORT`, or a proxy that sends each new
+connection to the least loaded process), then Grafana dashboards.
 
 ## How it works
 
@@ -166,7 +204,11 @@ With Docker — the image builds the web client, installs the server and downloa
 ```sh
 docker build -t chordfinder .
 docker run --rm -p 8000:8000 chordfinder
+docker run --rm -e CHORDFINDER_WORKERS=2 -p 8000:8000 chordfinder    # choose the number of processes
 ```
+
+By default the image starts one server process per CPU of the container, at most 8 (`--cpuset-cpus` counts,
+`--cpus` does not: set `CHORDFINDER_WORKERS` then). Each process holds its own copy of the model and librosa.
 
 Open http://localhost:8000/ (or http://localhost:8000/?game for the game), allow the microphone, play a chord. The image is 255 MB to download: Python
 runtime dependencies only, no TensorFlow, no Godot.
@@ -177,8 +219,11 @@ export templates.
 ```sh
 (cd backend && uv sync && uv run chordfinder weights)
 (cd frontend && mkdir -p build/web && godot --headless --export-release Web build/web/index.html)
-(cd backend && uv run uvicorn chordfinder.server:app --port 8000)
+(cd backend && uv run chordfinder-serve --workers 2)           # several processes
+(cd backend && uv run uvicorn chordfinder.server:app --port 8000)   # one process, for development
 ```
+
+Run the measuring mode (`CHORDFINDER_SESSIONS`) and load measurements of one process with a single process.
 
 Open http://localhost:8000/, allow the microphone, play a chord.
 

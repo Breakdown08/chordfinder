@@ -273,8 +273,13 @@ def server_stats(before: str, after: str, seconds: float) -> ServerStats:
         count: float = grew(f"{histogram}_count", stage)
         return grew(f"{histogram}_sum", stage) / count * 1000 if count > 0 else None
 
-    cpu_key: SeriesKey = ("process_cpu_seconds_total", None)
-    cpu: float | None = grew(cpu_key[0]) / seconds if cpu_key in a and cpu_key in b and seconds > 0 else None
+    cpu: float | None = None
+    # The server's own counter (sums over processes) first; process_* is what an older server has.
+    name: str
+    for name in ("chordfinder_cpu_seconds_total", "process_cpu_seconds_total"):
+        if (name, None) in a and (name, None) in b:
+            cpu = grew(name) / seconds if seconds > 0 else None
+            break
     return ServerStats(
         cpu_cores=cpu,
         frames=round(grew("chordfinder_frames_total")),

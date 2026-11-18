@@ -3,6 +3,7 @@
 #
 #   docker build -t chordfinder .
 #   docker run --rm -p 8000:8000 chordfinder       # http://localhost:8000/
+#   docker run --rm -e CHORDFINDER_WORKERS=2 -p 8000:8000 chordfinder   # processes: one per CPU (max 8) by default
 #
 # GitHub API allows 60 unauthenticated requests per hour; CI passes its token as a build secret:
 #   docker build --secret id=github_token,env=GITHUB_TOKEN -t chordfinder .
@@ -62,7 +63,7 @@ COPY --from=server /app/backend /app/backend
 COPY --from=web /src/frontend/build/web /app/web
 # librosa JIT-compiles through numba: the first answer would take ~9 s. Compile once here, into a
 # cache the server user owns (by default numba caches next to its sources, read-only at runtime).
-ENV CHORDFINDER_WEB=/app/web PATH=/app/backend/.venv/bin:$PATH PYTHONUNBUFFERED=1 NUMBA_CACHE_DIR=/app/numba
+ENV CHORDFINDER_WEB=/app/web PATH=/app/backend/.venv/bin:$PATH PYTHONUNBUFFERED=1 NUMBA_CACHE_DIR=/app/numba OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 RUN python -c "import numpy as np; from chordfinder.model import ChordModel; from chordfinder.stream import recognize; \
 t = np.arange(48000, dtype=np.float32) / 48000; \
 print('warm-up:', recognize(ChordModel(), (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32), 48000))" \
@@ -72,4 +73,4 @@ WORKDIR /app/backend
 EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=20s --start-interval=2s \
     CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=2)"]
-CMD ["uvicorn", "chordfinder.server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["chordfinder-serve", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,94 @@
+{
+  "url": "ws://localhost:8001/ws/recognize",
+  "source": "synthetic",
+  "sample_rate": 48000,
+  "hop_seconds": 0.125,
+  "duration": 30.0,
+  "warmup": 3.0,
+  "grace": 2.0,
+  "criterion": {
+    "p95_max_ms": 125.0,
+    "max_lost_fraction": 0.0,
+    "max_backlog_growth_ms": 25.0,
+    "max_client_lag_p95_ms": 20.0
+  },
+  "host": {
+    "cpu": "Intel(R) Core(TM) Ultra 7 155H",
+    "logical_cpus": 22,
+    "python": "3.12.13"
+  },
+  "steps": [
+    {
+      "clients": 56,
+      "measured": 12096,
+      "on_time": 12096,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 3.30830075108679,
+        "p95": 8.168023548932979,
+        "p99": 10.442368126678037,
+        "max": 15.68389294698136
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.0013514436432160437,
+      "client_loop_lag_p95_ms": 1.0072103992570165,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 1.184788577338651,
+        "frames": 13440,
+        "silent": 0,
+        "frame_ms": 5.74451420866678,
+        "threadpool_wait_ms": 0.06894513885851795,
+        "stream_lag_ms": 9.343393656782458,
+        "loop_lag_ms": 0.32867162161952607,
+        "stage_ms": {
+          "resample": 1.5983000420549485,
+          "features": 3.3196690777436917,
+          "inference": 0.2771845693949953
+        }
+      }
+    },
+    {
+      "clients": 64,
+      "measured": 13824,
+      "on_time": 13824,
+      "late": 0,
+      "error_replies": 0,
+      "lost": 0,
+      "connection_errors": 0,
+      "latency_ms": {
+        "p50": 3.53125207402627,
+        "p95": 12.601520768293977,
+        "p99": 16.47894445115526,
+        "max": 28.20199687994318
+      },
+      "late_fraction": 0.0,
+      "lost_fraction": 0.0,
+      "backlog_growth_ms": 0.039174694393295795,
+      "client_loop_lag_p95_ms": 1.0202726014540504,
+      "verdict": "pass",
+      "reasons": [],
+      "server": {
+        "cpu_cores": 1.361922364679268,
+        "frames": 15360,
+        "silent": 0,
+        "frame_ms": 3.9564908628975104,
+        "threadpool_wait_ms": 0.07042394661548694,
+        "stream_lag_ms": 0.5311743959846165,
+        "loop_lag_ms": 0.30077439491044905,
+        "stage_ms": {
+          "resample": 0.3140875048970315,
+          "features": 2.878604070933951,
+          "inference": 0.27481787104193245
+        }
+      }
+    }
+  ],
+  "ceiling": 64,
+  "stopped_by": null
+}
