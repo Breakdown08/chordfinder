@@ -112,8 +112,7 @@ to `backend/models/trained/` (not in git).
 
 ```sh
 cd backend
-uv run chordfinder dataset                         # download and verify the dataset (see below), or:
-uv run chordfinder dataset --archive archive.zip   #   unpack a zip downloaded from Kaggle by hand
+uv run chordfinder dataset --archive archive.zip   # unpack and verify a zip downloaded from Kaggle (see below)
 uv run chordfinder dataset --check                 # verify an existing directory against dataset.json
 uv run --group train chordfinder train             # Keras, CPU; writes chord-cnn.keras, chord-cnn.onnx, meta.json, history.json
 uv run chordfinder weights --all
@@ -125,8 +124,8 @@ the models gets right, exact McNemar p-value). The ONNX file has the same graph 
 so `ChordModel("models/trained")` and `tools/takes.py --models models/trained` load it unchanged.
 
 The dataset is pinned by a hash of its content, not of its zip (Kaggle may rebuild the zip and unpackers spell some
-file names differently). A mirror in a GitHub Release is used by `chordfinder dataset` once one is pinned in
-`dataset.json`; until then download `archive.zip` from the Kaggle page and use `--archive`.
+file names differently). Kaggle serves the zip only to a signed-in account: download `archive.zip` from the
+[dataset page](https://www.kaggle.com/datasets/fabianavinci/guitar-chords-v3) and pass it with `--archive`.
 
 What is kept from the thesis recipe: features, the model (`model_Conv2D`), windows (envelope mask at 0.01, whole
 one-second windows, the tail dropped), Adam 1e-3, categorical cross-entropy (in its sparse form), batch 32, 30 epochs,
