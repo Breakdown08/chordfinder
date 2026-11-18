@@ -31,7 +31,7 @@ Same scenario before and after the rebuild, reproducible with the tools in the l
 | Cold start to first answer | 2.3 s | 0.86 s (first run after install: ~9 s, see below) | `tools/bench.py` |
 | Strum to chord, median | 0.31 s, but a wrong chord flashes in 53 of 80 recordings | 0.61 s, wrong chord in 1 of 80 | `tools/latency_cmp.py` |
 | Environment | 2.5 GB venv (TensorFlow 1.7 GB) | 539 MB, no TensorFlow at runtime | size of `.venv` |
-| Tests | 0 | 64 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
+| Tests | 0 | 134 backend, 35 client checks, 4 browser e2e (2 of them in CI against the Docker image; the others need the dataset) | CI |
 
 Cold start counts the first answer, and librosa compiles its functions through numba on first use: right
 after installing, with no numba cache yet, the first answer takes ~9 s; later starts reuse the cache. The Docker
@@ -141,7 +141,17 @@ What the test measures: the split has no guitar on both sides (45 guitars in `Tr
 is "new guitar, not new player": one performer (JO) appears on both sides with different instruments, and the virtual
 AcusticPlug guitars of `Test` come from the same plugin as those of `Training`.
 
-Training time, accuracy of the new model and the comparison with the thesis weights are not measured yet.
+Measured on an Intel Core Ultra 7 155H, CPU only, `--seed 0 --val 0.15`:
+
+- Training takes 56 s wall time (52 s of it the fit itself), 1.2 GB peak memory; 4177 training windows, 1132
+  validation windows, validation accuracy 89.3 %. ONNX and Keras outputs differ by at most 2.4e-7.
+- A second run with the same seed gives a byte-identical `chord-cnn.onnx`; `history.json` differs only in the
+  recorded duration.
+- On the test split the new model gets 300 of 320 files right (93.8 %), the thesis weights 307 (95.9 %). Only the
+  thesis model is right on 13 files, only the new one on 6, both are wrong on 7: McNemar p = 0.17, so the
+  difference is not significant. The new model is weakest on Bdim (82.5 % against 95 %) and gets every G right.
+
+The runtime keeps the thesis weights: the retrained model reproduces them within noise, it is not better.
 
 ## Test
 
