@@ -63,7 +63,9 @@ COPY --from=server /app/backend /app/backend
 COPY --from=web /src/frontend/build/web /app/web
 # librosa JIT-compiles through numba: the first answer would take ~9 s. Compile once here, into a
 # cache the server user owns (by default numba caches next to its sources, read-only at runtime).
-ENV CHORDFINDER_WEB=/app/web PATH=/app/backend/.venv/bin:$PATH PYTHONUNBUFFERED=1 NUMBA_CACHE_DIR=/app/numba OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+# numba keys its cache by the host CPU: an image built on one machine and run on another missed it
+# and compiled on the first request. NUMBA_CPU_NAME=generic makes the cache portable.
+ENV CHORDFINDER_WEB=/app/web PATH=/app/backend/.venv/bin:$PATH PYTHONUNBUFFERED=1 NUMBA_CACHE_DIR=/app/numba NUMBA_CPU_NAME=generic OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
 RUN python -c "import numpy as np; from chordfinder.model import ChordModel; from chordfinder.stream import recognize; \
 t = np.arange(48000, dtype=np.float32) / 48000; \
 print('warm-up:', recognize(ChordModel(), (0.3 * np.sin(2 * np.pi * 440 * t)).astype(np.float32), 48000))" \
