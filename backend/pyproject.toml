@@ -2,6 +2,7 @@
 name = "chordfinder"
 version = "0.2.0"
 description = "Guitar chord recognition (CNN on log-mel spectrograms) served to a Godot web game"
+license = "Apache-2.0"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     # numpy<2: the export group pins TensorFlow 2.16.2, and uv resolves all groups together.

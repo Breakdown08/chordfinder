@@ -293,3 +293,8 @@ Accuracy, parity and latency tests need the dataset and skip without it. It is n
 
 The tests of the training code that need TensorFlow run in the CI job `train`, or locally with
 `(cd backend && uv run --group train pytest tests/test_train.py)`.
+
+## License
+
+The code is Apache 2.0, see `LICENSE`. The dataset is not part of the repository and keeps its own license
+(CC BY-SA 4.0, see above).
