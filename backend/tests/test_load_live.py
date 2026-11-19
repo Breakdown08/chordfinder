@@ -9,6 +9,7 @@ import socket
 import threading
 import time
 from collections.abc import Callable, Iterator
+from dataclasses import replace
 from pathlib import Path
 from typing import NamedTuple
 
@@ -18,7 +19,15 @@ import uvicorn
 from chordfinder import stream
 from chordfinder.audio import Audio
 from chordfinder.cli import main
-from chordfinder.load import LoadConfig, LoadReport, StepResult, ceiling, run_step, synthetic_signal
+from chordfinder.load import (
+    Criterion,
+    LoadConfig,
+    LoadReport,
+    StepResult,
+    ceiling,
+    run_step,
+    synthetic_signal,
+)
 from chordfinder.model import ChordModel
 from chordfinder.stream import Heard, Timings
 
@@ -61,7 +70,14 @@ def config(live: Live) -> LoadConfig:
 
 
 def test_two_clients_pass_on_a_free_server(live: Live) -> None:
-    result: StepResult = asyncio.run(run_step(config(live), 2, synthetic_signal(48000, 10, 0)))
+    # CI runners are slower than the measurement machine and the server shares this
+    # process (and the GIL) with the generator, so speed is not judged here: the test
+    # checks the mechanics - no losses, every frame measured, server metrics present.
+    # The real ceiling is measured by hand (README, Load); the p95 failure path is
+    # test_a_slow_server_fails_on_p95.
+    mechanics: Criterion = Criterion(p95_max=1.0, max_client_lag_p95=float("inf"))
+    cfg: LoadConfig = replace(config(live), criterion=mechanics)
+    result: StepResult = asyncio.run(run_step(cfg, 2, synthetic_signal(48000, 10, 0)))
     assert result.verdict == "pass", result.reasons
     assert result.lost == 0
     assert result.connection_errors == 0
